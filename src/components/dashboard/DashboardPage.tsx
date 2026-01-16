@@ -6,6 +6,7 @@ import expense from '../../assets/spending.png'
 import forecast from '../../assets/forecast.png'
 import settings from '../../assets/settings.png'
 import profile from '../../assets/profile.png'
+import AreaChartComp from "./AreaChart";
 
 const Dashboard: React.FC = () => {
   const [navbarOpen, setnavbarOpen] = useState<boolean>(true);
@@ -18,13 +19,13 @@ const Dashboard: React.FC = () => {
               ];
 
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex w-full h-screen bg-gray-100">
       {/* Sidebar */}
         {navbarOpen 
           ?
           <aside className="w-12 bg-white shadow-md p-2 flex flex-col">  
           <div className="flex flex-col items-center mb-8">
-          <div className="w-10 h-10 p-5 rounded-full bg-blue-500 flex items-center justify-center text-white text-2xl mb-10">
+          <div className="w-10 h-10 p-5 rounded-full bg-blue-500 flex items-center justify-center text-white text-2xl my-5">
             😊
           </div>
           <button onClick={() => setnavbarOpen(!navbarOpen)} className="p-5">☰</button>
@@ -54,7 +55,6 @@ const Dashboard: React.FC = () => {
             <button className="text-left px-4 py-2 rounded hover:bg-gray-200 hover:font-semibold">Settings</button>
             <button className="text-left px-4 py-2 rounded hover:bg-gray-200 hover:font-semibold">Profile</button>
           </nav>
-        
         </div>
       </aside>
       }
@@ -104,7 +104,8 @@ const Dashboard: React.FC = () => {
             Monthly balance projection
           </p>
           <div className="h-80 flex items-center justify-center text-gray-400 font-semibold">
-            Line Chart (Recharts)
+            <AreaChartComp />
+
           </div>
         </div>
 
