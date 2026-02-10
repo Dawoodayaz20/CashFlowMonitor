@@ -4,27 +4,27 @@ import { AreaChart, Area } from "recharts";
 // data:any, key:number
 const data = [
     {
-        name: "John",
+        month: "Jan",
         income: 3000,
     },
     {
-        name: "Alex",
+        month: "Feb",
         income: 4000,
     },
     {
-        name: "Alex",
+        month: "March",
         income: 2000,
     },
     {
-        name: "Alex",
+        month: "April",
         income: 1500,
     },
     {
-        name: "Alex",
+        month: "May",
         income: 1800,
     },
     {
-        name: "Alex",
+        month: "June",
         income: 1800,
     },
 ]
