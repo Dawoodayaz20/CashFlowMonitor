@@ -1,4 +1,5 @@
 import React from "react";
+import Backend from "./testbackend";
 
 const Auth: React.FC = () => {
   return (
@@ -35,7 +36,7 @@ const Auth: React.FC = () => {
           <div className="flex items-center justify-between text-sm">
             <label className="flex items-center gap-2">
               <input type="checkbox" />
-              Remember me
+              Remember me!
             </label>
             <button type="button" className="text-blue-600 hover:underline">
               Forgot password?
@@ -43,6 +44,7 @@ const Auth: React.FC = () => {
           </div>
 
           <button
+            onClick={(() => Backend())}
             type="submit"
             className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
           >
