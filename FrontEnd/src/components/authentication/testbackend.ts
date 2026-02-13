@@ -1,20 +1,22 @@
 // In any component
-const Backend = async () => {
+const SignUp = async (name : string, email : string, pass : string) => {
   try {
-    const response = await fetch('http://localhost:5000/api/test', {
+    const response = await fetch('http://localhost:5000/api/auth/register', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ 
-        name: 'John',
-        message: 'Hello from frontend!' 
+        name: name,
+        email: email,
+        password: pass
       })
     });
     
+    console.log('Response status:', response.status)
     const data = await response.json();
-    console.log('Backend response:', data);
-    alert(JSON.stringify(data));
+    console.log('Response data:', data);
+
   } catch (error) {
     console.error('Error:', error);
   }
@@ -23,4 +25,4 @@ const Backend = async () => {
 // Add button
 {/* <button onClick={testBackend}>Test Backend</button> */}
 
-export default Backend;
+export default SignUp;

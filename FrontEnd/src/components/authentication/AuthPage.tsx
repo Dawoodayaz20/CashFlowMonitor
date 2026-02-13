@@ -1,7 +1,11 @@
-import React from "react";
-import Backend from "./testbackend";
+import React, { useState } from "react";
+import SignUp from "./testbackend";
 
 const Auth: React.FC = () => {
+  const [name, setName] = useState<string>("");
+  const [email, setEmail] = useState<string>("");
+  const [pass, setPass] = useState<string>("");
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="w-full max-w-md bg-white rounded-xl shadow-lg p-8">
@@ -16,10 +20,21 @@ const Auth: React.FC = () => {
         {/* Form */}
         <form className="space-y-4">
           <div>
+            <label className="text-sm text-gray-600">Full Name</label>
+            <input
+              type="text"
+              placeholder="Name"
+              onChange={e => setName(e.target.value)}
+              className="w-full mt-1 px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+
+          <div>
             <label className="text-sm text-gray-600">Email</label>
             <input
               type="email"
               placeholder="you@example.com"
+              onChange={e => setEmail(e.target.value)}
               className="w-full mt-1 px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
@@ -29,6 +44,7 @@ const Auth: React.FC = () => {
             <input
               type="password"
               placeholder="••••••••"
+              onChange={e => setPass(e.target.value)}
               className="w-full mt-1 px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
@@ -44,11 +60,11 @@ const Auth: React.FC = () => {
           </div>
 
           <button
-            onClick={(() => Backend())}
+            onClick={(() => SignUp(name, email, pass))}
             type="submit"
             className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
           >
-            Sign In
+            Sign Up
           </button>
         </form>
 
