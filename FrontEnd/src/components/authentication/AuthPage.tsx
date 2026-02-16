@@ -61,7 +61,7 @@ const Auth: React.FC = () => {
 
           <button
             onClick={(() => SignUp(name, email, pass))}
-            type="submit"
+            type='button'
             className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
           >
             Sign Up

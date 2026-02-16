@@ -1,5 +1,7 @@
 // In any component
 const SignUp = async (name : string, email : string, pass : string) => {
+  
+  
   try {
     const response = await fetch('http://localhost:5000/api/auth/register', {
       method: 'POST',
@@ -13,9 +15,10 @@ const SignUp = async (name : string, email : string, pass : string) => {
       })
     });
     
-    console.log('Response status:', response.status)
+    // console.log('Response status:', response.status)
     const data = await response.json();
-    console.log('Response data:', data);
+    console.log('Backend Response:', data);
+    console.log('Status:', response.status);  // ADD THIS
 
   } catch (error) {
     console.error('Error:', error);
