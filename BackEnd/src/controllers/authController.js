@@ -2,9 +2,11 @@ const User = require('../models/User');
 
 // Register new user
 const register = async (req, res) => {
+  console.log('📥 Register request received:', req.body); // ADD THIS
+
   try {
     const { name, email, password } = req.body;
-
+    
     // Check if user already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {

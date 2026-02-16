@@ -20,11 +20,11 @@ const userSchema = new mongoose.Schema({
   timestamps: true  // Adds createdAt and updatedAt automatically
 });
 
-userSchema.pre('save', async function(next) {
-    if (!this.isModified('password')) return next();
+userSchema.pre('save', async function(){
+    if (!this.isModified('password')) return;
 
     this.password = await bcrypt.hash(this.password, 10);
-    next();     // Note: The next function tells mongoose to move to the next step
-})
+    ;     // Note: The next function tells mongoose to move to the next step
+});
 
 module.exports = mongoose.model('User', userSchema);
