@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import SignUp from "./testbackend";
+import {SignUp, SignIn} from "./testbackend";
 
 const Auth: React.FC = () => {
   const [name, setName] = useState<string>("");
@@ -60,7 +60,7 @@ const Auth: React.FC = () => {
           </div>
 
           <button
-            onClick={(() => SignUp(name, email, pass))}
+            onClick={(() => SignIn(email, pass))}
             type='button'
             className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
           >

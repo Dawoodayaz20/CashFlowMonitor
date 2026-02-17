@@ -1,6 +1,24 @@
-// In any component
-const SignUp = async (name : string, email : string, pass : string) => {
-  
+
+export const SignIn = async (email:string, password: string) => {
+  try{
+    const response = fetch('http://localhost:5000/api/auth/login', {
+      method:'POST',
+      headers:{ 'Content-Type': 'application/json' },
+      credentials:'include',
+      body: JSON.stringify({email, password})
+    })
+
+    const data = (await response).json();
+    console.log('Login response:', data);
+    return data;
+
+  }
+  catch(error){
+    console.error("There was an error processing Login Request:", error);
+  }
+}
+
+export const SignUp = async (name : string, email : string, pass : string) => {
   
   try {
     const response = await fetch('http://localhost:5000/api/auth/register', {
@@ -28,4 +46,3 @@ const SignUp = async (name : string, email : string, pass : string) => {
 // Add button
 {/* <button onClick={testBackend}>Test Backend</button> */}
 
-export default SignUp;
