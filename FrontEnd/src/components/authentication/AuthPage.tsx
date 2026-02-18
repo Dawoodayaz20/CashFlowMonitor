@@ -1,5 +1,7 @@
-import React, { Component, useState } from "react";
+import React, { useState } from "react";
 import {SignUp, SignIn} from "./testbackend";
+// import useAuthStore from "../../store/useAuthStore";
+import { useNavigate } from "react-router-dom";
 
 const Auth: React.FC = () => {
   const [name, setName] = useState<string>("");
@@ -11,6 +13,12 @@ const Auth: React.FC = () => {
   const toggleSignin = () => {
     return setSignIn(!signin);
   }
+
+  const navigate = useNavigate();
+
+  // const { user } = useAuthStore();
+  // console.log('Current user:', user);
+
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
@@ -68,7 +76,7 @@ const Auth: React.FC = () => {
           </div>
 
           <button
-            onClick={(() => SignIn(email, pass))}
+            onClick={() => SignIn(email, pass, navigate)}
             type='button'
             className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
           >
