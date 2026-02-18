@@ -50,6 +50,19 @@ export const SignUp = async (name : string, email : string, pass : string) => {
   }
 };
 
-// Add button
-{/* <button onClick={testBackend}>Test Backend</button> */}
+export const SignOut = async(navigate:any) => {
+  const { clearUser } = useAuthStore.getState();
 
+  try{
+    await fetch('http://localhost:5000/api/auth/logout', {
+      method: 'POST',
+      credentials: 'include'
+    });
+
+  clearUser();
+  navigate('/');
+  }
+  catch(error){
+    console.log("Logout error:", error);
+  }
+}
