@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useState, useEffect} from "react";
 import { Link } from "react-router-dom";
 import dashboard from '../../assets/dashboard.png'
 import income from '../../assets/salary.png'
@@ -7,16 +7,23 @@ import forecast from '../../assets/forecast.png'
 import settings from '../../assets/settings.png'
 import profile from '../../assets/profile.png'
 import AreaChartComp from "./AreaChart";
+import useAuthStore from "../../store/useAuthStore";
+import { useNavigate } from "react-router-dom";
+import { SignOut } from "../authentication/testbackend";
+
 
 const Dashboard: React.FC = () => {
+  
   const [navbarOpen, setnavbarOpen] = useState<boolean>(true);
-  const data = [
-                { month: "Jan", balance: 1000 },
-                { month: "Feb", balance: 800 },
-                { month: "Mar", balance: 400 },
-                { month: "Apr", balance: 100 },
-                { month: "May", balance: -200 },
-              ];
+  // const data = [
+  //               { month: "Jan", balance: 1000 },
+  //               { month: "Feb", balance: 800 },
+  //               { month: "Mar", balance: 400 },
+  //               { month: "Apr", balance: 100 },
+  //               { month: "May", balance: -200 },
+  //             ];
+  
+  const navigate = useNavigate();
 
   return (
     <div className="flex w-full h-screen bg-gray-100">
@@ -54,6 +61,7 @@ const Dashboard: React.FC = () => {
             <button className="text-left px-4 py-2 rounded hover:bg-gray-200 hover:font-semibold">Cash-Flow Forecast</button>
             <button className="text-left px-4 py-2 rounded hover:bg-gray-200 hover:font-semibold">Settings</button>
             <button className="text-left px-4 py-2 rounded hover:bg-gray-200 hover:font-semibold">Profile</button>
+            <button className="text-left px-4 py-2 rounded hover:bg-gray-200 hover:font-semibold" onClick={() => SignOut(navigate)}>Sign Out</button>
           </nav>
         </div>
       </aside>
@@ -105,7 +113,6 @@ const Dashboard: React.FC = () => {
           </p>
           <div className="h-80 flex items-center justify-center text-gray-400 font-semibold">
             <AreaChartComp />
-
           </div>
         </div>
 
