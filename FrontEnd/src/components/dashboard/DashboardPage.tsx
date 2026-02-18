@@ -9,7 +9,7 @@ import profile from '../../assets/profile.png'
 import AreaChartComp from "./AreaChart";
 import useAuthStore from "../../store/useAuthStore";
 import { useNavigate } from "react-router-dom";
-import { SignOut } from "../authentication/testbackend";
+import { SignOut } from "../authentication/authMethods";
 
 
 const Dashboard: React.FC = () => {
