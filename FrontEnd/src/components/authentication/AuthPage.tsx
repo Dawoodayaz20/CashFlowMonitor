@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import {SignUp, SignIn} from "./testbackend";
+import {SignUp, SignIn} from "./authMethods";
 // import useAuthStore from "../../store/useAuthStore";
 import { useNavigate } from "react-router-dom";
 
