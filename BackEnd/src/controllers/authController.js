@@ -57,7 +57,7 @@ const login = async (req, res) => {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
-      maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+      maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
     });
 
     res.json({
@@ -74,5 +74,19 @@ const login = async (req, res) => {
   }
 };
 
+const logout = async(req, res) => {
+  try{
+    res.clearCookie('token', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict'
+  });
+  
+  res.json({ message: 'Logged out successfully' });
+  }
+  catch(err){
+    console.log("Error while logging out!",err)
+  };
+}
 
-module.exports = { register, login };
+module.exports = { register, login, logout };
