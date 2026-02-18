@@ -3,7 +3,7 @@ import './index.css';
 import { useEffect } from 'react';
 import Dashboard from './components/dashboard/DashboardPage';
 import Auth from './components/authentication/AuthPage';
-import { Routes, BrowserRouter, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import useAuthStore from './store/useAuthStore';
 import type React from 'react';
 
