@@ -1,17 +1,24 @@
+import useAuthStore from "../../store/useAuthStore"
+// import { useNavigate } from 'react-router-dom';
 
-export const SignIn = async (email:string, password: string) => {
+export const SignIn = async (email:string, password: string, navigate: any) => {
+  const { setUser } = useAuthStore.getState();
+
   try{
-    const response = fetch('http://localhost:5000/api/auth/login', {
+    const response = await fetch('http://localhost:5000/api/auth/login', {
       method:'POST',
       headers:{ 'Content-Type': 'application/json' },
       credentials:'include',
       body: JSON.stringify({email, password})
     })
 
-    const data = (await response).json();
+    const data = await response.json();
+    if(response.ok){
+      setUser(data.user);
+      navigate('/dashboard')
+    }
     console.log('Login response:', data);
     return data;
-
   }
   catch(error){
     console.error("There was an error processing Login Request:", error);
