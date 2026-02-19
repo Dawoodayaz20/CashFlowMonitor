@@ -7,7 +7,6 @@ import forecast from '../../assets/forecast.png'
 import settings from '../../assets/settings.png'
 import profile from '../../assets/profile.png'
 import AreaChartComp from "./AreaChart";
-import useAuthStore from "../../store/useAuthStore";
 import { useNavigate } from "react-router-dom";
 import { SignOut } from "../authentication/authMethods";
 
@@ -15,13 +14,6 @@ import { SignOut } from "../authentication/authMethods";
 const Dashboard: React.FC = () => {
   
   const [navbarOpen, setnavbarOpen] = useState<boolean>(true);
-  // const data = [
-  //               { month: "Jan", balance: 1000 },
-  //               { month: "Feb", balance: 800 },
-  //               { month: "Mar", balance: 400 },
-  //               { month: "Apr", balance: 100 },
-  //               { month: "May", balance: -200 },
-  //             ];
   
   const navigate = useNavigate();
 
