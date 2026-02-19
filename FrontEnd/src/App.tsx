@@ -3,6 +3,8 @@ import './index.css';
 import { useEffect } from 'react';
 import Dashboard from './components/dashboard/DashboardPage';
 import Auth from './components/authentication/AuthPage';
+import TransactionPage from './components/TransactionPage/transactionPage';
+import AppLayout from './AppLayout';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import useAuthStore from './store/useAuthStore';
 import type React from 'react';
@@ -10,11 +12,9 @@ import type React from 'react';
 function App() {
   const { user, clearUser } = useAuthStore();
 
-  function ProtectedRoute({children} : {children: React.ReactNode}) {
-  if (!user) {
-    return <Navigate to="/" replace />;
-  }
-  return <>{children}</>;
+  function ProtectedLayout() {
+    if (!user) return <Navigate to="/" replace />;
+    return <AppLayout />;  // AppLayout contains <Outlet /> internally
   }
 
   useEffect(() => {
@@ -39,7 +39,15 @@ function App() {
   return (
         <Routes>
           <Route path='/' element={user ? <Navigate to="/dashboard" /> : <Auth />} />
-          <Route path='/dashboard' element={<ProtectedRoute><Dashboard /></ProtectedRoute>}/>
+          <Route element={<ProtectedLayout />}>
+        <Route path="/dashboard"element={<Dashboard />} />
+        <Route path="/income"element={<TransactionPage type="income" />} />
+        <Route path="/expense"element={<TransactionPage type="expense" />} />
+        {/* <Route path="/forecast"  element={<ForecastPage />} />
+        <Route path="/settings"  element={<SettingsPage />} />
+        <Route path="/profile"   element={<ProfilePage />} /> */}
+        <Route path="*"element={<Navigate to="/dashboard" />} />
+      </Route>
         </Routes>
   )
 }
