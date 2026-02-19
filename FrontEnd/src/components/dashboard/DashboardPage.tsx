@@ -21,12 +21,12 @@ interface TransactionForm {
 // ─── Sidebar Nav Items ────────────────────────────────────────────────────────
 
 const NAV_ITEMS = [
-  { label: "Dashboard", icon: null, imgKey: "dashboard" },
-  { label: "Income",    icon: null, imgKey: "income"    },
-  { label: "Expense",   icon: null, imgKey: "expense"   },
-  { label: "Forecast",  icon: null, imgKey: "forecast"  },
-  { label: "Settings",  icon: null, imgKey: "settings"  },
-  { label: "Profile",   icon: null, imgKey: "profile"   },
+  { label: "Dashboard", icon: null, imgKey: "dashboard", link: '/' },
+  { label: "Income",    icon: null, imgKey: "income", link: '/income'    },
+  { label: "Expense",   icon: null, imgKey: "expense" , link: '/expense'  },
+  { label: "Forecast",  icon: null, imgKey: "forecast", link: '/forecast'  },
+  { label: "Settings",  icon: null, imgKey: "settings", link: '/settings'  },
+  { label: "Profile",   icon: null, imgKey: "profile", link: '/profile'   },
 ];
 
 const NAV_ICONS: Record<string, string> = {
@@ -76,8 +76,8 @@ const SummaryCard: React.FC<SummaryCardProps> = ({ label, value, accent = "neutr
 
 const Dashboard: React.FC = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(true);
-  const [modalOpen, setModalOpen]               = useState<boolean>(false);
-  const [activeNav, setActiveNav]               = useState<string>("Dashboard");
+  const [modalOpen, setModalOpen] = useState<boolean>(false);
+  const [activeNav, setActiveNav] = useState<string>("Dashboard");
   const navigate = useNavigate();
 
   const handleTransactionSubmit = (data: TransactionForm) => {
@@ -98,104 +98,8 @@ const Dashboard: React.FC = () => {
   return (
     <div className="flex w-full h-screen bg-gray-50 font-sans">
 
-      {/* ── Sidebar ─────────────────────────────────────────────────────────── */}
-      <aside
-        className={`
-          ${sidebarCollapsed ? "w-16" : "w-60"}
-          bg-white border-r border-gray-100 shadow-sm flex flex-col
-          transition-all duration-300 ease-in-out overflow-hidden shrink-0
-        `}
-      >
-        {/* Top: Avatar + Toggle */}
-        <div className="flex flex-col items-center pt-5 pb-4 border-b border-gray-100 px-2">
-          <div
-            className="rounded-full flex items-center justify-center text-white font-bold shadow-md mb-2 shrink-0"
-            style={{
-              width: sidebarCollapsed ? 36 : 56,
-              height: sidebarCollapsed ? 36 : 56,
-              fontSize: sidebarCollapsed ? 16 : 22,
-              background: "linear-gradient(135deg, #0f766e, #14b8a6)",
-              transition: "all 0.3s ease",
-            }}
-          >
-            😊
-          </div>
-          {!sidebarCollapsed && (
-            <span className="text-sm font-semibold text-gray-700 mt-1 mb-0.5 truncate w-full text-center">
-              Name
-            </span>
-          )}
-          <button
-            onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-            className="mt-2 w-7 h-7 rounded-lg bg-gray-100 hover:bg-teal-50 hover:text-teal-600 flex items-center justify-center text-gray-500 text-sm transition"
-          >
-            {sidebarCollapsed ? "→" : "←"}
-          </button>
-        </div>
-
-        {/* Nav Items */}
-        <nav className="flex flex-col gap-1 px-2 py-4 flex-1">
-          {NAV_ITEMS.map((item) => {
-            const isActive = activeNav === item.label;
-            return (
-              <button
-                key={item.label}
-                onClick={() => setActiveNav(item.label)}
-                className={`
-                  flex items-center gap-3 px-2 py-2.5 rounded-xl text-sm font-medium transition-all duration-150
-                  ${isActive
-                    ? "bg-teal-600 text-white shadow-sm"
-                    : "text-gray-500 hover:bg-gray-100 hover:text-gray-800"
-                  }
-                  ${sidebarCollapsed ? "justify-center" : "justify-start"}
-                `}
-              >
-                <span className="text-base shrink-0">{NAV_ICONS[item.imgKey]}</span>
-                {!sidebarCollapsed && <span className="truncate">{item.label}</span>}
-              </button>
-            );
-          })}
-        </nav>
-
-        {/* Sign Out */}
-        <div className="px-2 pb-4">
-          <button
-            onClick={() => SignOut(navigate)}
-            className={`
-              w-full flex items-center gap-3 px-2 py-2.5 rounded-xl text-sm font-medium
-              text-rose-500 hover:bg-rose-50 transition
-              ${sidebarCollapsed ? "justify-center" : "justify-start"}
-            `}
-          >
-            <span className="text-base shrink-0">🚪</span>
-            {!sidebarCollapsed && <span>Sign Out</span>}
-          </button>
-        </div>
-      </aside>
-
       {/* ── Main Content ─────────────────────────────────────────────────────── */}
       <main className="flex-1 overflow-y-auto">
-
-        {/* Header Bar */}
-        <div className="sticky top-0 z-10 bg-white/80 backdrop-blur-md border-b border-gray-100 px-8 py-4 flex items-center justify-between">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-widest text-gray-400">Overview</p>
-            <h1 className="text-xl font-bold text-gray-800">Cash Flow Monitor</h1>
-          </div>
-          <div className="flex items-center gap-3">
-            <span className="text-sm text-gray-400 hidden md:block">
-              {new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}
-            </span>
-            <button
-              onClick={() => setModalOpen(true)}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-sm text-white shadow-md hover:opacity-90 active:scale-95 transition-all"
-              style={{ background: "linear-gradient(135deg, #0f766e, #14b8a6)" }}
-            >
-              <span className="text-base leading-none">+</span>
-              Add Transaction
-            </button>
-          </div>
-        </div>
 
         {/* Page Body */}
         <div className="px-8 py-6 space-y-6">
