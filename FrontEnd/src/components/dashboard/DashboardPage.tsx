@@ -1,171 +1,348 @@
-import React, {useState, useEffect} from "react";
-import { Link } from "react-router-dom";
-import dashboard from '../../assets/dashboard.png';
-import income from '../../assets/salary.png';
-import expense from '../../assets/spending.png';
-import forecast from '../../assets/forecast.png';
-import settings from '../../assets/settings.png';
-import profile from '../../assets/profile.png';
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import AreaChartComp from "./AreaChart";
-import { useNavigate } from "react-router-dom";
+import useAuthStore from "../../store/useAuthStore";
 import { SignOut } from "../authentication/authMethods";
 import AddTransactionModal from "../transactionModal/addTransaction";
 
+// ─── Types ────────────────────────────────────────────────────────────────────
+
+interface TransactionForm {
+  type: "income" | "expense";
+  amount: string;
+  category: string;
+  date: string;
+  note: string;
+  isRecurring: boolean;
+  frequency: "weekly" | "monthly" | "yearly";
+  endDate: string;
+}
+
+// ─── Sidebar Nav Items ────────────────────────────────────────────────────────
+
+const NAV_ITEMS = [
+  { label: "Dashboard", icon: null, imgKey: "dashboard" },
+  { label: "Income",    icon: null, imgKey: "income"    },
+  { label: "Expense",   icon: null, imgKey: "expense"   },
+  { label: "Forecast",  icon: null, imgKey: "forecast"  },
+  { label: "Settings",  icon: null, imgKey: "settings"  },
+  { label: "Profile",   icon: null, imgKey: "profile"   },
+];
+
+const NAV_ICONS: Record<string, string> = {
+  dashboard: "▦",
+  income:    "💰",
+  expense:   "💸",
+  forecast:  "📈",
+  settings:  "⚙️",
+  profile:   "👤",
+};
+
+// ─── Summary Card ─────────────────────────────────────────────────────────────
+
+interface SummaryCardProps {
+  label: string;
+  value: string;
+  accent?: "teal" | "rose" | "neutral" | "positive";
+  icon: string;
+}
+
+const SummaryCard: React.FC<SummaryCardProps> = ({ label, value, accent = "neutral", icon }) => {
+  const accentStyles = {
+    teal:     "from-teal-50 to-teal-100/60 border-teal-200",
+    rose:     "from-rose-50 to-rose-100/60 border-rose-200",
+    positive: "from-emerald-50 to-emerald-100/60 border-emerald-200",
+    neutral:  "from-white to-gray-50 border-gray-200",
+  };
+  const valueStyles = {
+    teal:     "text-teal-700",
+    rose:     "text-rose-600",
+    positive: "text-emerald-600",
+    neutral:  "text-gray-800",
+  };
+
+  return (
+    <div className={`bg-gradient-to-br ${accentStyles[accent]} border rounded-2xl p-5 shadow-sm`}>
+      <div className="flex items-center justify-between mb-3">
+        <p className="text-xs font-semibold uppercase tracking-wider text-gray-400">{label}</p>
+        <span className="text-lg">{icon}</span>
+      </div>
+      <p className={`text-2xl font-bold ${valueStyles[accent]}`}>{value}</p>
+    </div>
+  );
+};
+
+// ─── Dashboard Component ──────────────────────────────────────────────────────
 
 const Dashboard: React.FC = () => {
-  
-  const [navbarOpen, setnavbarOpen] = useState<boolean>(true);
-  const [modalOpen, setModalOpen] = useState<boolean>(false);
-  
+  const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(true);
+  const [modalOpen, setModalOpen]               = useState<boolean>(false);
+  const [activeNav, setActiveNav]               = useState<string>("Dashboard");
   const navigate = useNavigate();
 
-  const handleTransactionSubmit = (data: any) => {
-  console.log("Transaction submitted:", data);
-  // Later → useTransactionStore action goes here
+  const handleTransactionSubmit = (data: TransactionForm) => {
+    console.log("New transaction:", data);
+    // → wire to useTransactionStore later
   };
+
+  const MOCK_TRANSACTIONS = [
+  { id: 1, type: "income"  as const, label: "Salary",        date: "Feb 1, 2026",  amount: 2000 },
+  { id: 2, type: "expense" as const, label: "Rent",           date: "Feb 2, 2026",  amount: 800  },
+  { id: 3, type: "expense" as const, label: "Groceries",      date: "Feb 5, 2026",  amount: 120  },
+  { id: 4, type: "income"  as const, label: "Freelance",      date: "Feb 8, 2026",  amount: 500  },
+  { id: 5, type: "expense" as const, label: "Subscriptions",  date: "Feb 10, 2026", amount: 45   },
+  { id: 6, type: "expense" as const, label: "Transport",      date: "Feb 12, 2026", amount: 60   },
+];
 
 
   return (
-    <div className="flex w-full h-screen bg-gray-100">
-      {/* Sidebar */}
-        {navbarOpen 
-          ?
-          <aside className="w-12 bg-white shadow-md p-2 flex flex-col">  
-          <div className="flex flex-col items-center mb-8">
-          <div className="w-10 h-10 p-5 rounded-full bg-blue-500 flex items-center justify-center text-white text-2xl my-5">
+    <div className="flex w-full h-screen bg-gray-50 font-sans">
+
+      {/* ── Sidebar ─────────────────────────────────────────────────────────── */}
+      <aside
+        className={`
+          ${sidebarCollapsed ? "w-16" : "w-60"}
+          bg-white border-r border-gray-100 shadow-sm flex flex-col
+          transition-all duration-300 ease-in-out overflow-hidden shrink-0
+        `}
+      >
+        {/* Top: Avatar + Toggle */}
+        <div className="flex flex-col items-center pt-5 pb-4 border-b border-gray-100 px-2">
+          <div
+            className="rounded-full flex items-center justify-center text-white font-bold shadow-md mb-2 shrink-0"
+            style={{
+              width: sidebarCollapsed ? 36 : 56,
+              height: sidebarCollapsed ? 36 : 56,
+              fontSize: sidebarCollapsed ? 16 : 22,
+              background: "linear-gradient(135deg, #0f766e, #14b8a6)",
+              transition: "all 0.3s ease",
+            }}
+          >
             😊
           </div>
-          <button onClick={() => setnavbarOpen(!navbarOpen)} className="p-5">☰</button>
-          <div className="flex flex-col gap-4">
-            <Link to='/' className="hover:bg-gray-200"><img src={dashboard} className="w-6 h-6"></img></Link>
-            <Link to='/' className="hover:bg-gray-200"><img src={income} className="w-6 h-6"></img></Link>
-            <Link to='/' className="hover:bg-gray-200"><img src={expense} className="w-6 h-6"></img></Link>
-            <Link to='/' className="hover:bg-gray-200"><img src={forecast} className="w-6 h-6"></img></Link>
-            <Link to='/' className="hover:bg-gray-200"><img src={settings} className="w-6 h-6"></img></Link>
-            <Link to='/' className="hover:bg-gray-200"><img src={profile} className="w-6 h-6"></img></Link>
-          </div>
-          </div>
-          </aside>
-          :
-          <aside className="w-56 bg-white shadow-md p-2 flex flex-col">
-          <div className="flex flex-col items-center mb-8">
-          <div className="w-20 h-20 rounded-full bg-blue-500 flex items-center justify-center text-white text-2xl mb-2">
-            😊
-          </div>
-          <span className="font-semibold m-4">Name</span>
-          <button onClick={() => setnavbarOpen(!navbarOpen)} className="p-5">☰</button>
-          <nav className="flex flex-col gap-2">
-            <button className="text-left px-4 py-2 rounded hover:bg-gray-200 hover:font-semibold">Dashboard</button>
-            <button className="text-left px-4 py-2 rounded hover:bg-gray-200 hover:font-semibold" onClick={() => setModalOpen(true)}>Income</button>
-            <button className="text-left px-4 py-2 rounded hover:bg-gray-200 hover:font-semibold">Expense</button>
-            <button className="text-left px-4 py-2 rounded hover:bg-gray-200 hover:font-semibold">Cash-Flow Forecast</button>
-            <button className="text-left px-4 py-2 rounded hover:bg-gray-200 hover:font-semibold">Settings</button>
-            <button className="text-left px-4 py-2 rounded hover:bg-gray-200 hover:font-semibold">Profile</button>
-            <button className="text-left px-4 py-2 rounded hover:bg-gray-200 hover:font-semibold" onClick={() => SignOut(navigate)}>Sign Out</button>
-          </nav>
+          {!sidebarCollapsed && (
+            <span className="text-sm font-semibold text-gray-700 mt-1 mb-0.5 truncate w-full text-center">
+              Name
+            </span>
+          )}
+          <button
+            onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+            className="mt-2 w-7 h-7 rounded-lg bg-gray-100 hover:bg-teal-50 hover:text-teal-600 flex items-center justify-center text-gray-500 text-sm transition"
+          >
+            {sidebarCollapsed ? "→" : "←"}
+          </button>
+        </div>
+
+        {/* Nav Items */}
+        <nav className="flex flex-col gap-1 px-2 py-4 flex-1">
+          {NAV_ITEMS.map((item) => {
+            const isActive = activeNav === item.label;
+            return (
+              <button
+                key={item.label}
+                onClick={() => setActiveNav(item.label)}
+                className={`
+                  flex items-center gap-3 px-2 py-2.5 rounded-xl text-sm font-medium transition-all duration-150
+                  ${isActive
+                    ? "bg-teal-600 text-white shadow-sm"
+                    : "text-gray-500 hover:bg-gray-100 hover:text-gray-800"
+                  }
+                  ${sidebarCollapsed ? "justify-center" : "justify-start"}
+                `}
+              >
+                <span className="text-base shrink-0">{NAV_ICONS[item.imgKey]}</span>
+                {!sidebarCollapsed && <span className="truncate">{item.label}</span>}
+              </button>
+            );
+          })}
+        </nav>
+
+        {/* Sign Out */}
+        <div className="px-2 pb-4">
+          <button
+            onClick={() => SignOut(navigate)}
+            className={`
+              w-full flex items-center gap-3 px-2 py-2.5 rounded-xl text-sm font-medium
+              text-rose-500 hover:bg-rose-50 transition
+              ${sidebarCollapsed ? "justify-center" : "justify-start"}
+            `}
+          >
+            <span className="text-base shrink-0">🚪</span>
+            {!sidebarCollapsed && <span>Sign Out</span>}
+          </button>
         </div>
       </aside>
-      }
 
-      {/* Main Content */}
-      <main className="flex-1 p-6 overflow-y-auto">
-        {/* Header */}
-          <div className="flex items-center justify-between mb-6">
-            <h1 className="text-2xl font-bold">Cash Flow Monitor</h1>
+      {/* ── Main Content ─────────────────────────────────────────────────────── */}
+      <main className="flex-1 overflow-y-auto">
+
+        {/* Header Bar */}
+        <div className="sticky top-0 z-10 bg-white/80 backdrop-blur-md border-b border-gray-100 px-8 py-4 flex items-center justify-between">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-widest text-gray-400">Overview</p>
+            <h1 className="text-xl font-bold text-gray-800">Cash Flow Monitor</h1>
+          </div>
+          <div className="flex items-center gap-3">
+            <span className="text-sm text-gray-400 hidden md:block">
+              {new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}
+            </span>
             <button
-                onClick={() => setModalOpen(true)}
-                className="px-4 py-2 bg-teal-600 text-white rounded-xl font-semibold hover:bg-teal-700 transition"
-              >
-                + Add Transaction
+              onClick={() => setModalOpen(true)}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-sm text-white shadow-md hover:opacity-90 active:scale-95 transition-all"
+              style={{ background: "linear-gradient(135deg, #0f766e, #14b8a6)" }}
+            >
+              <span className="text-base leading-none">+</span>
+              Add Transaction
             </button>
           </div>
-
-        {/* Summary Cards */}
-        <div className="grid grid-cols-4 gap-4 mb-6">
-          <div className="bg-white p-4 rounded shadow">
-            <p className="text-sm text-gray-500">Total Balance</p>
-            <p className="text-xl font-bold">$1,000</p>
-          </div>
-          <div className="bg-white p-4 rounded shadow">
-            <p className="text-sm text-gray-500">Income</p>
-            <p className="text-xl font-bold">$2,000</p>
-          </div>
-          <div className="bg-white p-4 rounded shadow">
-            <p className="text-sm text-gray-500">Expenses</p>
-            <p className="text-xl font-bold">$700</p>
-          </div>
-          <div className="bg-white p-4 rounded shadow">
-            <p className="text-sm text-gray-500">Net Monthly Change</p>
-            <p className="text-xl font-bold text-green-600">+$1,300</p>
-          </div>
         </div>
 
-        {/* Risk Indicator */}
-        <div className="bg-white p-5 rounded shadow flex items-center justify-between mb-6">
-          <div>
-            <h2 className="text-lg font-semibold">Risk Status</h2>
-            <p className="text-sm text-gray-500">
-              Based on income, expenses & savings
-            </p>
-          </div>
-          <span className="px-4 py-2 rounded-full bg-green-100 text-green-700 font-semibold">
-            ✅ Safe
-          </span>
-        </div>
+        {/* Page Body */}
+        <div className="px-8 py-6 space-y-6">
 
-      {/* Cash Flow Forecast */}
-        <div className="bg-white p-6 rounded shadow mb-6">
-          <h2 className="text-lg font-semibold mb-2">Cash-Flow Forecast</h2>
-          <p className="text-sm text-gray-500 mb-4">
-            Monthly balance projection
-          </p>
-          <div className="h-80 flex items-center justify-center text-gray-400 font-semibold">
-            <AreaChartComp />
+          {/* ── Summary Cards ──────────────────────────────────────────────── */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <SummaryCard label="Total Balance"     value="$1,000"   accent="neutral"  icon="🏦" />
+            <SummaryCard label="Income"            value="$2,000"   accent="teal"     icon="💰" />
+            <SummaryCard label="Expenses"          value="$700"     accent="rose"     icon="💸" />
+            <SummaryCard label="Net Monthly"       value="+$1,300"  accent="positive" icon="📈" />
           </div>
-        </div>
 
-        {/* Monthly Summary */}
-        <div className="grid grid-cols-4 gap-4 mb-6">
-          {[
-            { label: "Avg Income", value: "$2,000" },
-            { label: "Avg Expenses", value: "$700" },
-            { label: "Monthly Net", value: "+$1,300" },
-            { label: "Survival Months", value: "8 months" },
-          ].map((item) => (
-            <div key={item.label} className="bg-white p-4 rounded shadow">
-              <p className="text-sm text-gray-500">{item.label}</p>
-              <p className="text-lg font-bold">{item.value}</p>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-stretch">
+
+            {/* LEFT: Risk Status + Transactions Overview */}
+            <div className="flex flex-col gap-4">
+
+              {/* Risk Status */}
+              <div className="bg-white border border-gray-100 rounded-2xl p-5 shadow-sm flex items-center justify-between">
+                <div>
+                  <h2 className="text-sm font-semibold uppercase tracking-wider text-gray-400 mb-1">Risk Status</h2>
+                  <p className="text-gray-600 text-sm">Based on income, expenses & savings rate</p>
+                </div>
+                <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-50 border border-emerald-200">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                  <span className="text-emerald-700 font-semibold text-sm">Safe</span>
+                </div>
+              </div>
+
+              {/* Transactions Overview */}
+              <div className="bg-white border border-gray-100 rounded-2xl p-5 shadow-sm flex-1">
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <h2 className="text-sm font-semibold uppercase tracking-wider text-gray-400 mb-1">Transactions Overview</h2>
+                    <p className="text-gray-500 text-xs">Your most recent entries</p>
+                  </div>
+                  <button className="text-xs font-semibold text-teal-600 hover:text-teal-700 transition">
+                    View all →
+                  </button>
+                </div>
+
+                {/* Transaction List — static placeholder, wired to store later */}
+                <div className="space-y-2">
+                  {MOCK_TRANSACTIONS.map((tx) => (
+                    <div
+                      key={tx.id}
+                      className="flex items-center justify-between px-4 py-3 rounded-xl border border-gray-100 hover:bg-gray-50 transition"
+                    >
+                      {/* Left: icon + label + date */}
+                      <div className="flex items-center gap-3">
+                        <div
+                          className={`w-8 h-8 rounded-full flex items-center justify-center text-sm shrink-0 ${
+                            tx.type === "income"
+                              ? "bg-teal-50 text-teal-600"
+                              : "bg-rose-50 text-rose-500"
+                          }`}
+                        >
+                          {tx.type === "income" ? "💰" : "💸"}
+                        </div>
+                        <div>
+                          <p className="text-sm font-semibold text-gray-700 leading-tight">{tx.label}</p>
+                          <p className="text-xs text-gray-400">{tx.date}</p>
+                        </div>
+                      </div>
+
+                      {/* Right: amount */}
+                      <span
+                        className={`text-sm font-bold ${
+                          tx.type === "income" ? "text-teal-600" : "text-rose-500"
+                        }`}
+                      >
+                        {tx.type === "income" ? "+" : "-"}${tx.amount.toLocaleString()}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
-          ))}
-        </div>
 
-        {/* What If Simulator */}
-        <div className="bg-white p-6 rounded shadow">
-          <h2 className="text-lg font-semibold mb-4">What If Simulator</h2>
+            {/* RIGHT: Cash Flow Forecast Chart */}
+            <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm flex flex-col">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h2 className="text-sm font-semibold uppercase tracking-wider text-gray-400 mb-1">Cash-Flow Forecast</h2>
+                  <p className="text-gray-600 text-sm">Monthly income vs expenses</p>
+                </div>
+                <span className="text-xs px-3 py-1 rounded-full bg-teal-50 text-teal-700 font-semibold border border-teal-100">
+                  Last 6 months
+                </span>
+              </div>
+              <div className="flex-1 flex items-center justify-center">
+                <AreaChartComp />
+              </div>
+            </div>
 
-          <div className="grid grid-cols-3 gap-4 mb-6">
-            <input
-              type="number"
-              placeholder="Increase rent"
-              className="border rounded px-3 py-2"
-            />
-            <input
-              type="number"
-              placeholder="Income change"
-              className="border rounded px-3 py-2"
-            />
-            <input
-              type="number"
-              placeholder="New expense"
-              className="border rounded px-3 py-2"
-            />
           </div>
 
-          <div className="h-60 flex items-center justify-center text-gray-400 font-semibold">
-            Updated Forecast Chart
+          {/* ── Monthly Summary Cards ──────────────────────────────────────── */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            {[
+              { label: "Avg Income",       value: "$2,000",   icon: "📊", accent: "teal"     as const },
+              { label: "Avg Expenses",     value: "$700",     icon: "🧾", accent: "rose"     as const },
+              { label: "Monthly Net",      value: "+$1,300",  icon: "💹", accent: "positive" as const },
+              { label: "Survival Months",  value: "8 months", icon: "🛡️", accent: "neutral"  as const },
+            ].map((item) => (
+              <SummaryCard key={item.label} label={item.label} value={item.value} icon={item.icon} accent={item.accent} />
+            ))}
           </div>
-        </div>
+
+          {/* ── What If Simulator ──────────────────────────────────────────── */}
+          <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
+            <div className="mb-5">
+              <h2 className="text-sm font-semibold uppercase tracking-wider text-gray-400 mb-1">What If Simulator</h2>
+              <p className="text-gray-600 text-sm">Adjust variables to see how your cash flow would change</p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+              {[
+                { placeholder: "Rent increase ($)", label: "Rent Change" },
+                { placeholder: "Income change ($)",  label: "Income Change" },
+                { placeholder: "New expense ($)",    label: "New Expense" },
+              ].map((field) => (
+                <div key={field.label}>
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1.5">
+                    {field.label}
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 font-semibold text-sm">$</span>
+                    <input
+                      type="number"
+                      placeholder="0.00"
+                      className="w-full pl-7 pr-4 py-2.5 border border-gray-200 rounded-xl text-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-teal-200 transition"
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="h-48 flex items-center justify-center rounded-xl border border-dashed border-gray-200 text-gray-300 font-semibold text-sm">
+              Updated forecast will appear here
+            </div>
+          </div>
+
+        </div>{/* end page body */}
       </main>
+
+      {/* ── Transaction Modal ─────────────────────────────────────────────────── */}
       <AddTransactionModal
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}
