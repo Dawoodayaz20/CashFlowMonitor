@@ -1,21 +1,29 @@
 import React, {useState, useEffect} from "react";
 import { Link } from "react-router-dom";
-import dashboard from '../../assets/dashboard.png'
-import income from '../../assets/salary.png'
-import expense from '../../assets/spending.png'
-import forecast from '../../assets/forecast.png'
-import settings from '../../assets/settings.png'
-import profile from '../../assets/profile.png'
+import dashboard from '../../assets/dashboard.png';
+import income from '../../assets/salary.png';
+import expense from '../../assets/spending.png';
+import forecast from '../../assets/forecast.png';
+import settings from '../../assets/settings.png';
+import profile from '../../assets/profile.png';
 import AreaChartComp from "./AreaChart";
 import { useNavigate } from "react-router-dom";
 import { SignOut } from "../authentication/authMethods";
+import AddTransactionModal from "../transactionModal/addTransaction";
 
 
 const Dashboard: React.FC = () => {
   
   const [navbarOpen, setnavbarOpen] = useState<boolean>(true);
+  const [modalOpen, setModalOpen] = useState<boolean>(false);
   
   const navigate = useNavigate();
+
+  const handleTransactionSubmit = (data: any) => {
+  console.log("Transaction submitted:", data);
+  // Later → useTransactionStore action goes here
+  };
+
 
   return (
     <div className="flex w-full h-screen bg-gray-100">
@@ -48,7 +56,7 @@ const Dashboard: React.FC = () => {
           <button onClick={() => setnavbarOpen(!navbarOpen)} className="p-5">☰</button>
           <nav className="flex flex-col gap-2">
             <button className="text-left px-4 py-2 rounded hover:bg-gray-200 hover:font-semibold">Dashboard</button>
-            <button className="text-left px-4 py-2 rounded hover:bg-gray-200 hover:font-semibold">Income</button>
+            <button className="text-left px-4 py-2 rounded hover:bg-gray-200 hover:font-semibold" onClick={() => setModalOpen(true)}>Income</button>
             <button className="text-left px-4 py-2 rounded hover:bg-gray-200 hover:font-semibold">Expense</button>
             <button className="text-left px-4 py-2 rounded hover:bg-gray-200 hover:font-semibold">Cash-Flow Forecast</button>
             <button className="text-left px-4 py-2 rounded hover:bg-gray-200 hover:font-semibold">Settings</button>
@@ -62,7 +70,15 @@ const Dashboard: React.FC = () => {
       {/* Main Content */}
       <main className="flex-1 p-6 overflow-y-auto">
         {/* Header */}
-        <h1 className="text-2xl font-bold mb-6">Cash Flow Monitor</h1>
+          <div className="flex items-center justify-between mb-6">
+            <h1 className="text-2xl font-bold">Cash Flow Monitor</h1>
+            <button
+                onClick={() => setModalOpen(true)}
+                className="px-4 py-2 bg-teal-600 text-white rounded-xl font-semibold hover:bg-teal-700 transition"
+              >
+                + Add Transaction
+            </button>
+          </div>
 
         {/* Summary Cards */}
         <div className="grid grid-cols-4 gap-4 mb-6">
@@ -150,6 +166,11 @@ const Dashboard: React.FC = () => {
           </div>
         </div>
       </main>
+      <AddTransactionModal
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+        onSubmit={handleTransactionSubmit}
+      />
     </div>
   );
 };
