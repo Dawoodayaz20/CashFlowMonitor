@@ -18,26 +18,6 @@ interface TransactionForm {
   endDate: string;
 }
 
-// ─── Sidebar Nav Items ────────────────────────────────────────────────────────
-
-const NAV_ITEMS = [
-  { label: "Dashboard", icon: null, imgKey: "dashboard", link: '/' },
-  { label: "Income",    icon: null, imgKey: "income", link: '/income'    },
-  { label: "Expense",   icon: null, imgKey: "expense" , link: '/expense'  },
-  { label: "Forecast",  icon: null, imgKey: "forecast", link: '/forecast'  },
-  { label: "Settings",  icon: null, imgKey: "settings", link: '/settings'  },
-  { label: "Profile",   icon: null, imgKey: "profile", link: '/profile'   },
-];
-
-const NAV_ICONS: Record<string, string> = {
-  dashboard: "▦",
-  income:    "💰",
-  expense:   "💸",
-  forecast:  "📈",
-  settings:  "⚙️",
-  profile:   "👤",
-};
-
 // ─── Summary Card ─────────────────────────────────────────────────────────────
 
 interface SummaryCardProps {
@@ -75,9 +55,7 @@ const SummaryCard: React.FC<SummaryCardProps> = ({ label, value, accent = "neutr
 // ─── Dashboard Component ──────────────────────────────────────────────────────
 
 const Dashboard: React.FC = () => {
-  const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(true);
   const [modalOpen, setModalOpen] = useState<boolean>(false);
-  const [activeNav, setActiveNav] = useState<string>("Dashboard");
   const navigate = useNavigate();
 
   const handleTransactionSubmit = (data: TransactionForm) => {
