@@ -1,6 +1,6 @@
 const express = require('express');
-const Transaction = require('Transaction');
-const authMiddleware = require('authMiddleware');
+const Transaction = require('../models/Transaction');
+const authMiddleware = require('../middleware/authMiddleware');
 
 const router = express.Router();
 router.use(authMiddleware);
@@ -55,7 +55,7 @@ router.put('/:id', async(req, res) => {
     }
 });
 
-router.delete('/:id', verifyToken, async (req, res) => {
+router.delete('/:id', async (req, res) => {
   try {
     const transaction = await Transaction.findOneAndDelete({
       _id: req.params.id,
