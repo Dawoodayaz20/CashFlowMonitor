@@ -15,4 +15,6 @@ router.get('/verify', authMiddleware, (req, res) => {
 
 router.post('/logout', logout);
 
+router.post('/addTransact', addTransaction);
+
 module.exports = router;
