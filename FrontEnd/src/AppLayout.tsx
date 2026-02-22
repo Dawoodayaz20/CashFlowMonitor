@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Outlet, NavLink, useNavigate, useLocation } from "react-router-dom";
 import { SignOut } from "./components/authentication/authMethods";
 import AddTransactionModal from "./components/transactionModal/addTransaction";
+import useTransactionStore from "./store/useTransactionStore";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -45,11 +46,13 @@ const AppLayout: React.FC = () => {
   const [modalOpen,  setModalOpen]  = useState<boolean>(false);
   const navigate  = useNavigate();
   const location  = useLocation();
+  const { addTransaction } = useTransactionStore();
 
   const pageInfo  = PAGE_TITLES[location.pathname] ?? { title: "Cash Flow Monitor", sub: "Overview" };
 
-  const handleTransactionSubmit = (data: TransactionForm) => {
+  const handleTransactionSubmit = async (data: TransactionForm) => {
     console.log("New transaction:", data);
+    await addTransaction(data);
     // → wire to useTransactionStore later
   };
 
