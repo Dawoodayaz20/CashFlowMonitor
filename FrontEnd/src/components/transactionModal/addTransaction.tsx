@@ -20,6 +20,7 @@ interface AddTransactionModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (data: TransactionForm) => void;
+  initialData?: Partial<TransactionForm>;
 }
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -39,7 +40,7 @@ const today = new Date().toISOString().split("T")[0];
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
-const AddTransactionModal: React.FC<AddTransactionModalProps> = ({ isOpen, onClose, onSubmit }) => {
+const AddTransactionModal: React.FC<AddTransactionModalProps> = ({ isOpen, onClose, onSubmit, initialData }) => {
   const [form, setForm] = useState<TransactionForm>({
     type: "income",
     amount: "",
@@ -49,6 +50,7 @@ const AddTransactionModal: React.FC<AddTransactionModalProps> = ({ isOpen, onClo
     isRecurring: false,
     frequency: "monthly",
     endDate: "",
+    ...initialData,
   });
 
   const [errors, setErrors] = useState<Partial<Record<keyof TransactionForm, string>>>({});
@@ -69,8 +71,8 @@ const AddTransactionModal: React.FC<AddTransactionModalProps> = ({ isOpen, onClo
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = (e?: React.FormEvent) => {
+    e?.preventDefault();
     if (!validate()) return;
     onSubmit(form);
     onClose();
