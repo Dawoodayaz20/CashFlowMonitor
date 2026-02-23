@@ -1,9 +1,8 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import AreaChartComp from "./AreaChart";
-import useAuthStore from "../../store/useAuthStore";
-import { SignOut } from "../authentication/authMethods";
 import AddTransactionModal from "../transactionModal/addTransaction";
+import useTransactionStore from "../../store/useTransactionStore";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -57,11 +56,22 @@ const SummaryCard: React.FC<SummaryCardProps> = ({ label, value, accent = "neutr
 const Dashboard: React.FC = () => {
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   const navigate = useNavigate();
+  const { transactions, fetchTransactions} = useTransactionStore();
+
+  useEffect(()=>{
+    fetchTransactions();
+  }, [])
 
   const handleTransactionSubmit = (data: TransactionForm) => {
     console.log("New transaction:", data);
     // → wire to useTransactionStore later
   };
+
+  const recentTransactions = transactions
+  .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+  .slice(0,5);
+
+  console.log(recentTransactions.map((ent) => ent.amount));
 
   const MOCK_TRANSACTIONS = [
   { id: 1, type: "income"  as const, label: "Salary",        date: "Feb 1, 2026",  amount: 2000 },
@@ -71,7 +81,6 @@ const Dashboard: React.FC = () => {
   { id: 5, type: "expense" as const, label: "Subscriptions",  date: "Feb 10, 2026", amount: 45   },
   { id: 6, type: "expense" as const, label: "Transport",      date: "Feb 12, 2026", amount: 60   },
 ];
-
 
   return (
     <div className="flex w-full h-screen bg-gray-50 font-sans">
@@ -121,9 +130,9 @@ const Dashboard: React.FC = () => {
 
                 {/* Transaction List — static placeholder, wired to store later */}
                 <div className="space-y-2">
-                  {MOCK_TRANSACTIONS.map((tx) => (
+                  {recentTransactions.map((tx) => (
                     <div
-                      key={tx.id}
+                      key={tx._id}
                       className="flex items-center justify-between px-4 py-3 rounded-xl border border-gray-100 hover:bg-gray-50 transition"
                     >
                       {/* Left: icon + label + date */}
@@ -138,8 +147,8 @@ const Dashboard: React.FC = () => {
                           {tx.type === "income" ? "💰" : "💸"}
                         </div>
                         <div>
-                          <p className="text-sm font-semibold text-gray-700 leading-tight">{tx.label}</p>
-                          <p className="text-xs text-gray-400">{tx.date}</p>
+                          <p className="text-sm font-semibold text-gray-700 leading-tight">{tx.note}</p>
+                          <p className="text-xs text-gray-400">{new Date(tx.date).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</p>
                         </div>
                       </div>
 
