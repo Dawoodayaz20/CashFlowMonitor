@@ -300,7 +300,7 @@ const AddTransactionModal: React.FC<AddTransactionModalProps> = ({ isOpen, onClo
               isIncome ? "bg-teal-600" : "bg-rose-600"
             }`}
           >
-            Save Transaction
+            { initialData ? "Update Transaction" : "Save Transaction"}
           </button>
         </div>
       </div>
