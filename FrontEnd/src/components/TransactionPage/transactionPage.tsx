@@ -240,12 +240,12 @@ const TransactionPage: React.FC<TransactionPageProps> = ({ type }) => {
               {th.icon} {th.label}
             </h1>
           </div>
-          {/* <button
+          <button
             onClick={() => { setEditingTx(null); setModalOpen(true); }}
             className="flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-sm bg-white/20 hover:bg-white/30 text-white border border-white/30 transition active:scale-95"
           >
             + Add {type === "income" ? "Income" : "Expense"}
-          </button> */}
+          </button>
         </div>
 
         {/* ── Summary Cards ── */}
@@ -328,7 +328,7 @@ const TransactionPage: React.FC<TransactionPageProps> = ({ type }) => {
         )}
 
         {/* ── Transactions Table ── */}
-        <div className="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
+        <div className="bg-white border border-gray-100 rounded-2xl shadow-sm ">
 
           {/* Toolbar */}
           <div className="flex items-center justify-between gap-4 px-6 py-4 border-b border-gray-100">
@@ -429,12 +429,12 @@ const TransactionPage: React.FC<TransactionPageProps> = ({ type }) => {
       </div>
 
       {/* ── Modal ── */}
-      {/* <AddTransactionModal
+      <AddTransactionModal
         isOpen={modalOpen}
         onClose={() => { setModalOpen(false); setEditingTx(null); }}
         onSubmit={handleModalSubmit}
         initialData={editInitialData}
-      /> */}
+      />
     </div>
   );
 };
