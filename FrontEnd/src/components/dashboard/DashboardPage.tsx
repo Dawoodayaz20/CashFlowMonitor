@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import AreaChartComp from "./AreaChart";
 import AddTransactionModal from "../transactionModal/addTransaction";
 import useTransactionStore from "../../store/useTransactionStore";
@@ -82,6 +82,12 @@ const Dashboard: React.FC = () => {
   { id: 6, type: "expense" as const, label: "Transport",      date: "Feb 12, 2026", amount: 60   },
 ];
 
+  const totalIncome : number = recentTransactions
+  .filter((tx) => tx.type === 'income')
+  .reduce((sum, tx) => sum + tx.amount, 0);
+
+  console.log(totalIncome)
+
   return (
     <div className="flex w-full h-screen bg-gray-50 font-sans">
 
@@ -93,10 +99,10 @@ const Dashboard: React.FC = () => {
 
           {/* ── Summary Cards ──────────────────────────────────────────────── */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            <SummaryCard label="Total Balance"     value="$1,000"   accent="neutral"  icon="🏦" />
-            <SummaryCard label="Income"            value="$2,000"   accent="teal"     icon="💰" />
-            <SummaryCard label="Expenses"          value="$700"     accent="rose"     icon="💸" />
-            <SummaryCard label="Net Monthly"       value="+$1,300"  accent="positive" icon="📈" />
+            <SummaryCard label="Total Balance"     value={`$${totalIncome}`}   accent="neutral"  icon="🏦" />
+            <SummaryCard label="Income"            value={`$${totalIncome}`}   accent="teal"     icon="💰" />
+            <SummaryCard label="Expenses"          value={`$${totalIncome}`}     accent="rose"     icon="💸" />
+            <SummaryCard label="Net Monthly"       value={`$${totalIncome}`} accent="positive" icon="📈" />
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-stretch">
