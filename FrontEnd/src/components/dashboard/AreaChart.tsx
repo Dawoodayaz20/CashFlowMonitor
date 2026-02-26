@@ -66,7 +66,7 @@ const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
-const AreaChartComp: React.FC<AreaChartCompProps> = ({ data = defaultData }) => {
+const AreaChartComp: React.FC<AreaChartCompProps> = ({ data }) => {
   return (
     <div className="w-full" style={{ height: 280 }}>
       <ResponsiveContainer width="100%" height="100%">
