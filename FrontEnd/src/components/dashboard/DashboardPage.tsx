@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import AreaChartComp from "./AreaChart";
 import AddTransactionModal from "../transactionModal/addTransaction";
 import useTransactionStore from "../../store/useTransactionStore";
+import type { Transaction } from "../../../types";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -15,6 +16,16 @@ interface TransactionForm {
   isRecurring: boolean;
   frequency: "weekly" | "monthly" | "yearly";
   endDate: string;
+}
+
+interface transactionDataInt {
+  month: string,
+  income: number,
+  expense: number
+}
+
+interface AreaChartData {
+  data ?: transactionDataInt[]
 }
 
 // ─── Summary Card ─────────────────────────────────────────────────────────────
@@ -55,7 +66,7 @@ const SummaryCard: React.FC<SummaryCardProps> = ({ label, value, accent = "neutr
 
 const Dashboard: React.FC = () => {
   const [modalOpen, setModalOpen] = useState<boolean>(false);
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const { transactions, fetchTransactions} = useTransactionStore();
 
   useEffect(()=>{
@@ -63,15 +74,61 @@ const Dashboard: React.FC = () => {
   }, [])
 
   const handleTransactionSubmit = (data: TransactionForm) => {
-    console.log("New transaction:", data);
+    // console.log("New transaction:", data);
     // → wire to useTransactionStore later
   };
+// month: new Date(a.date).toLocaleString('default', { month: 'short' })
+
+  // const chartData = (data: Transaction[]): transactionDataInt[] => {
+  //   return data.map((a) => ({
+  //       month: new Date(a.date).toLocaleString('default', { month: 'short' }),
+  //       income: a.type === 'income' ? a.amount : 0,
+  //       expense: a.type === 'expense' ? a.amount : 0
+  //     }))
+  //   };
+
+  const chartData = (data: Transaction[]): transactionDataInt[] => {
+  // Step 1: Group and aggregate by month
+  const monthMap: Record<string, transactionDataInt> = {};
+
+  data.forEach((tx) => {
+    const date  = new Date(tx.date);
+    // Key by "YYYY-MM" so sorting works correctly
+    const key   = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+    const label = date.toLocaleString("default", { month: "short" });
+
+    if (!monthMap[key]) {
+      monthMap[key] = { month: label, income: 0, expense: 0 };
+    }
+
+    if (tx.type === "income")  monthMap[key].income  += tx.amount;
+    if (tx.type === "expense") monthMap[key].expense += tx.amount;
+  });
+
+  // Step 2: Sort by "YYYY-MM" key ascending, then return just the values
+  return Object.entries(monthMap)
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([, value]) => value);
+};
+
+  console.log(chartData(transactions))
 
   const recentTransactions = transactions
   .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
   .slice(0,5);
 
-  console.log(recentTransactions.map((ent) => ent.amount));
+  // console.log(transactions.map((a) => {
+  //   return new Date(a.date).toLocaleString('default', { month: 'short' })
+  // }));
+
+  const monthChart = transactions.map((a) => {
+    return new Date(a.date).toLocaleString('default', { month: 'short' })
+  });
+  
+  // const Data : DataPoint[] = (transactions) => {
+  //   const month = transactions.map((a) => {
+  //   return new Date(a.date).toLocaleString('default', { month: 'short' })
+  // })
 
   const MOCK_TRANSACTIONS = [
   { id: 1, type: "income"  as const, label: "Salary",        date: "Feb 1, 2026",  amount: 2000 },
@@ -86,7 +143,17 @@ const Dashboard: React.FC = () => {
   .filter((tx) => tx.type === 'income')
   .reduce((sum, tx) => sum + tx.amount, 0);
 
+  const totalExpense : number = recentTransactions
+  .filter((tx) => tx.type ==='expense')
+  .reduce((sum, tx) => sum + tx.amount, 0) 
+
+  const totalBalance : number = totalIncome - totalExpense
+
+  const AvgIncome = (amount: number) : number => Math.round(amount/12);
+  const AvgExpense = (amount: number) : number => Math.round(amount/12);
+  
   console.log(totalIncome)
+  console.log(AvgIncome(totalIncome))
 
   return (
     <div className="flex w-full h-screen bg-gray-50 font-sans">
@@ -99,9 +166,9 @@ const Dashboard: React.FC = () => {
 
           {/* ── Summary Cards ──────────────────────────────────────────────── */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            <SummaryCard label="Total Balance"     value={`$${totalIncome}`}   accent="neutral"  icon="🏦" />
+            <SummaryCard label="Total Balance"     value={`$${totalBalance}`}   accent="neutral"  icon="🏦" />
             <SummaryCard label="Income"            value={`$${totalIncome}`}   accent="teal"     icon="💰" />
-            <SummaryCard label="Expenses"          value={`$${totalIncome}`}     accent="rose"     icon="💸" />
+            <SummaryCard label="Expenses"          value={`$${totalExpense}`}     accent="rose"     icon="💸" />
             <SummaryCard label="Net Monthly"       value={`$${totalIncome}`} accent="positive" icon="📈" />
           </div>
 
@@ -184,7 +251,7 @@ const Dashboard: React.FC = () => {
                 </span>
               </div>
               <div className="flex-1 flex items-center justify-center">
-                <AreaChartComp />
+                <AreaChartComp data={chartData(transactions)}/>
               </div>
             </div>
 
@@ -193,9 +260,9 @@ const Dashboard: React.FC = () => {
           {/* ── Monthly Summary Cards ──────────────────────────────────────── */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             {[
-              { label: "Avg Income",       value: "$2,000",   icon: "📊", accent: "teal"     as const },
-              { label: "Avg Expenses",     value: "$700",     icon: "🧾", accent: "rose"     as const },
-              { label: "Monthly Net",      value: "+$1,300",  icon: "💹", accent: "positive" as const },
+              { label: "Avg Income",       value: `${AvgIncome(totalIncome)}`,   icon: "📊", accent: "teal"     as const },
+              { label: "Avg Expenses",     value: `${AvgExpense(totalExpense)}`,     icon: "🧾", accent: "rose"     as const },
+              { label: "Monthly Net",      value: `${AvgExpense(totalBalance)}`,  icon: "💹", accent: "positive" as const },
               { label: "Survival Months",  value: "8 months", icon: "🛡️", accent: "neutral"  as const },
             ].map((item) => (
               <SummaryCard key={item.label} label={item.label} value={item.value} icon={item.icon} accent={item.accent} />
