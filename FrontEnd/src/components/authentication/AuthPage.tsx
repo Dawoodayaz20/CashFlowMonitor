@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import {SignUp, SignIn} from "./authMethods";
+import AuthError from "./AuthError";
 // import useAuthStore from "../../store/useAuthStore";
 import { useNavigate } from "react-router-dom";
 
@@ -7,18 +8,27 @@ const Auth: React.FC = () => {
   const [name, setName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [pass, setPass] = useState<string>("");
-
-  const [signin, setSignIn] = useState<boolean>(true)
+  const [signin, setSignIn] = useState<boolean>(true);
+  const [error, setError] = useState<{ message: string } | null>(null);
 
   const toggleSignin = () => {
-    return setSignIn(!signin);
-  }
+    setError(null);
+    setSignIn(!signin);
+  };
+
+  const handleSignIn = async () => {
+    setError(null);
+    const result = await SignIn(email, pass, navigate);
+    if (result?.message) setError(result);
+  };
+
+  const handleSignUp = async () => {
+    setError(null);
+    const result : any = await SignUp(name, email, pass);
+    if (result?.message) setError(result);
+  };
 
   const navigate = useNavigate();
-
-  // const { user } = useAuthStore();
-  // console.log('Current user:', user);
-
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
@@ -36,13 +46,6 @@ const Auth: React.FC = () => {
           <div>
           <form className="space-y-4">
           <div>
-            {/* <label className="text-sm text-gray-600">Full Name</label>
-            <input
-              type="text"
-              placeholder="Name"
-              onChange={e => setName(e.target.value)}
-              className="w-full mt-1 px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-            /> */}
           </div>
 
           <div>
@@ -50,7 +53,7 @@ const Auth: React.FC = () => {
             <input
               type="email"
               placeholder="you@example.com"
-              onChange={e => setEmail(e.target.value)}
+              onChange={e => { setEmail(e.target.value); setError(null); }}
               className="w-full mt-1 px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
@@ -60,7 +63,7 @@ const Auth: React.FC = () => {
             <input
               type="password"
               placeholder="••••••••"
-              onChange={e => setPass(e.target.value)}
+              onChange={e => { setPass(e.target.value); setError(null); }}
               className="w-full mt-1 px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
@@ -75,8 +78,10 @@ const Auth: React.FC = () => {
             </button>
           </div>
 
+          <AuthError error={error} />
+
           <button
-            onClick={() => SignIn(email, pass, navigate)}
+            onClick={handleSignIn}
             type='button'
             className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
           >
@@ -105,7 +110,7 @@ const Auth: React.FC = () => {
             <input
               type="text"
               placeholder="Name"
-              onChange={e => setName(e.target.value)}
+              onChange={e => { setName(e.target.value); setError(null); }}
               className="w-full mt-1 px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
@@ -115,7 +120,7 @@ const Auth: React.FC = () => {
             <input
               type="email"
               placeholder="you@example.com"
-              onChange={e => setEmail(e.target.value)}
+              onChange={e => { setEmail(e.target.value); setError(null); }}
               className="w-full mt-1 px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
@@ -125,7 +130,7 @@ const Auth: React.FC = () => {
             <input
               type="password"
               placeholder="••••••••"
-              onChange={e => setPass(e.target.value)}
+              onChange={e => { setPass(e.target.value); setError(null); }}
               className="w-full mt-1 px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
@@ -140,8 +145,10 @@ const Auth: React.FC = () => {
             </button>
           </div>
 
+          <AuthError error={error} />
+
           <button
-            onClick={(() => SignUp(name, email, pass))}
+            onClick={handleSignUp}
             type='button'
             className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
           >
@@ -149,15 +156,12 @@ const Auth: React.FC = () => {
           </button>
         </form>
 
-        
-          {/* Divider */}
         <div className="my-6 flex items-center">
           <div className="flex-1 h-px bg-gray-300" />
           <span className="px-3 text-sm text-gray-500">OR</span>
           <div className="flex-1 h-px bg-gray-300" />
         </div>
 
-        {/* Secondary Action */}
         <button 
         onClick={toggleSignin}
         className="w-full border py-2 rounded hover:bg-gray-100 transition">
