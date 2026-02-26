@@ -24,10 +24,6 @@ interface transactionDataInt {
   expense: number
 }
 
-interface AreaChartData {
-  data ?: transactionDataInt[]
-}
-
 // ─── Summary Card ─────────────────────────────────────────────────────────────
 
 interface SummaryCardProps {
@@ -77,39 +73,33 @@ const Dashboard: React.FC = () => {
     // console.log("New transaction:", data);
     // → wire to useTransactionStore later
   };
-// month: new Date(a.date).toLocaleString('default', { month: 'short' })
-
-  // const chartData = (data: Transaction[]): transactionDataInt[] => {
-  //   return data.map((a) => ({
-  //       month: new Date(a.date).toLocaleString('default', { month: 'short' }),
-  //       income: a.type === 'income' ? a.amount : 0,
-  //       expense: a.type === 'expense' ? a.amount : 0
-  //     }))
-  //   };
 
   const chartData = (data: Transaction[]): transactionDataInt[] => {
-  // Step 1: Group and aggregate by month
-  const monthMap: Record<string, transactionDataInt> = {};
+  // Step 1: Build the last 6 months as fixed buckets
+  const months: transactionDataInt[] = [];
 
+  for (let i = 5; i >= 0; i--) {
+    const d = new Date();
+    d.setMonth(d.getMonth() - i);
+    months.push({
+      month: d.toLocaleString("default", { month: "short" }),
+      income: 0,
+      expense: 0,
+    });
+  }
+
+  // Step 2: Loop transactions and add amounts to the right bucket
   data.forEach((tx) => {
-    const date  = new Date(tx.date);
-    // Key by "YYYY-MM" so sorting works correctly
-    const key   = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
-    const label = date.toLocaleString("default", { month: "short" });
+    const txMonth = new Date(tx.date).toLocaleString("default", { month: "short" });
+    const bucket  = months.find((m) => m.month === txMonth);
+    if (!bucket) return;
 
-    if (!monthMap[key]) {
-      monthMap[key] = { month: label, income: 0, expense: 0 };
-    }
-
-    if (tx.type === "income")  monthMap[key].income  += tx.amount;
-    if (tx.type === "expense") monthMap[key].expense += tx.amount;
+    if (tx.type === "income")  bucket.income  += tx.amount;
+    if (tx.type === "expense") bucket.expense += tx.amount;
   });
 
-  // Step 2: Sort by "YYYY-MM" key ascending, then return just the values
-  return Object.entries(monthMap)
-    .sort(([a], [b]) => a.localeCompare(b))
-    .map(([, value]) => value);
-};
+  return months;
+  };
 
   console.log(chartData(transactions))
 
