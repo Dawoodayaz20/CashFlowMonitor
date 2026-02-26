@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import Dashboard from './components/dashboard/DashboardPage';
 import Auth from './components/authentication/AuthPage';
 import TransactionPage from './components/TransactionPage/transactionPage';
-import ForecastPage from './pages/forecastPage';
+import ForecastPage from './pages/ForecastPage/forecastPage';
 import AppLayout from './AppLayout';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import useAuthStore from './store/useAuthStore';
