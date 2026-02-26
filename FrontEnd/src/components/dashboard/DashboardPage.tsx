@@ -120,15 +120,6 @@ const Dashboard: React.FC = () => {
   //   return new Date(a.date).toLocaleString('default', { month: 'short' })
   // })
 
-  const MOCK_TRANSACTIONS = [
-  { id: 1, type: "income"  as const, label: "Salary",        date: "Feb 1, 2026",  amount: 2000 },
-  { id: 2, type: "expense" as const, label: "Rent",           date: "Feb 2, 2026",  amount: 800  },
-  { id: 3, type: "expense" as const, label: "Groceries",      date: "Feb 5, 2026",  amount: 120  },
-  { id: 4, type: "income"  as const, label: "Freelance",      date: "Feb 8, 2026",  amount: 500  },
-  { id: 5, type: "expense" as const, label: "Subscriptions",  date: "Feb 10, 2026", amount: 45   },
-  { id: 6, type: "expense" as const, label: "Transport",      date: "Feb 12, 2026", amount: 60   },
-];
-
   const totalIncome : number = recentTransactions
   .filter((tx) => tx.type === 'income')
   .reduce((sum, tx) => sum + tx.amount, 0);
@@ -250,9 +241,9 @@ const Dashboard: React.FC = () => {
           {/* ── Monthly Summary Cards ──────────────────────────────────────── */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             {[
-              { label: "Avg Income",       value: `${AvgIncome(totalIncome)}`,   icon: "📊", accent: "teal"     as const },
-              { label: "Avg Expenses",     value: `${AvgExpense(totalExpense)}`,     icon: "🧾", accent: "rose"     as const },
-              { label: "Monthly Net",      value: `${AvgExpense(totalBalance)}`,  icon: "💹", accent: "positive" as const },
+              { label: "Avg Income",       value: `$${AvgIncome(totalIncome)}`,   icon: "📊", accent: "teal"     as const },
+              { label: "Avg Expenses",     value: `$${AvgExpense(totalExpense)}`,     icon: "🧾", accent: "rose"     as const },
+              { label: "Monthly Net",      value: `$${AvgExpense(totalBalance)}`,  icon: "💹", accent: "positive" as const },
               { label: "Survival Months",  value: "8 months", icon: "🛡️", accent: "neutral"  as const },
             ].map((item) => (
               <SummaryCard key={item.label} label={item.label} value={item.value} icon={item.icon} accent={item.accent} />
