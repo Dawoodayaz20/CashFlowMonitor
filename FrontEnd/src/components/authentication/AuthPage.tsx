@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 import {SignUp, SignIn} from "./authMethods";
 import AuthError from "./AuthError";
-// import useAuthStore from "../../store/useAuthStore";
 import { useNavigate } from "react-router-dom";
 
 const Auth: React.FC = () => {
   const [name, setName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [pass, setPass] = useState<string>("");
+  const [hidePass, sethidePass] = useState<boolean>(true);
   const [signin, setSignIn] = useState<boolean>(true);
   const [error, setError] = useState<{ message: string } | null>(null);
 
@@ -60,12 +60,50 @@ const Auth: React.FC = () => {
 
           <div>
             <label className="text-sm text-gray-600">Password</label>
-            <input
-              type="password"
+            <div className="flex relative">
+              <input
+              type={`${hidePass ? 'password' : 'text'}`}
               placeholder="••••••••"
               onChange={e => { setPass(e.target.value); setError(null); }}
               className="w-full mt-1 px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
+            <button type="button" className="text-sm px-2 py-2 mt-1 text-gray-600 border rounded focus:outline-none" onClick={(() => sethidePass(!hidePass))}>
+            { hidePass ?
+             <svg xmlns="http://www.w3.org/2000/svg" 
+                width="20" height="20" 
+                fill="none" 
+                viewBox="0 0 24 24" 
+                stroke="currentColor" 
+                stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M2.458 12C3.732 7.943 7.523 5 12 5
+                  c4.477 0 8.268 2.943 9.542 7
+                  -1.274 4.057-5.065 7-9.542 7
+                  -4.477 0-8.268-2.943-9.542-7z" />
+              </svg> 
+            :
+              <svg xmlns="http://www.w3.org/2000/svg" 
+                  width="20" height="20" 
+                  fill="none" 
+                  viewBox="0 0 24 24" 
+                  stroke="currentColor" 
+                  stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M13.875 18.825A10.05 10.05 0 0112 19
+                    c-4.477 0-8.268-2.943-9.542-7
+                    a9.956 9.956 0 012.042-3.368M6.7 6.7
+                    A9.956 9.956 0 0112 5
+                    c4.477 0 8.268 2.943 9.542 7
+                    a9.97 9.97 0 01-4.043 4.568M15 12
+                    a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M3 3l18 18" />
+              </svg>
+            }
+            </button>
+            </div>
           </div>
 
           <div className="flex items-center justify-between text-sm">
@@ -127,12 +165,50 @@ const Auth: React.FC = () => {
 
           <div>
             <label className="text-sm text-gray-600">Password</label>
-            <input
-              type="password"
+            <div className="flex relative">
+              <input
+              type={`${hidePass ? 'password' : 'text'}`}
               placeholder="••••••••"
               onChange={e => { setPass(e.target.value); setError(null); }}
               className="w-full mt-1 px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
+            <button type="button" className="text-sm px-2 py-2 mt-1 text-gray-600 border rounded focus:outline-none" onClick={(() => sethidePass(!hidePass))}>
+            { hidePass ?
+              <svg xmlns="http://www.w3.org/2000/svg" 
+                width="20" height="20" 
+                fill="none" 
+                viewBox="0 0 24 24" 
+                stroke="currentColor" 
+                stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M2.458 12C3.732 7.943 7.523 5 12 5
+                  c4.477 0 8.268 2.943 9.542 7
+                  -1.274 4.057-5.065 7-9.542 7
+                  -4.477 0-8.268-2.943-9.542-7z" />
+              </svg> 
+            :
+              <svg xmlns="http://www.w3.org/2000/svg" 
+                  width="20" height="20" 
+                  fill="none" 
+                  viewBox="0 0 24 24" 
+                  stroke="currentColor" 
+                  stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M13.875 18.825A10.05 10.05 0 0112 19
+                    c-4.477 0-8.268-2.943-9.542-7
+                    a9.956 9.956 0 012.042-3.368M6.7 6.7
+                    A9.956 9.956 0 0112 5
+                    c4.477 0 8.268 2.943 9.542 7
+                    a9.97 9.97 0 01-4.043 4.568M15 12
+                    a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M3 3l18 18" />
+              </svg>
+            }
+            </button>
+            </div>
           </div>
 
           <div className="flex items-center justify-between text-sm">
