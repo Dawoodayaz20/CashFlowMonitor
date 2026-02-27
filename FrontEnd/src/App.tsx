@@ -5,6 +5,7 @@ import Dashboard from './components/dashboard/DashboardPage';
 import Auth from './components/authentication/AuthPage';
 import TransactionPage from './components/TransactionPage/transactionPage';
 import ForecastPage from './pages/ForecastPage/forecastPage';
+import SettingsPage from './pages/SettingsPage/settingsPage';
 import AppLayout from './AppLayout';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import useAuthStore from './store/useAuthStore';
@@ -45,8 +46,8 @@ function App() {
         <Route path="/income"element={<TransactionPage type="income" />} />
         <Route path="/expense"element={<TransactionPage type="expense" />} />
         <Route path="/forecast"  element={<ForecastPage />} />
-        {/*<Route path="/settings"  element={<SettingsPage />} />
-        <Route path="/profile"   element={<ProfilePage />} /> */}
+        <Route path="/settings"  element={<SettingsPage />} />
+        {/*<Route path="/profile"   element={<ProfilePage />} /> */}
         <Route path="*"element={<Navigate to="/dashboard" />} />
       </Route>
         </Routes>
