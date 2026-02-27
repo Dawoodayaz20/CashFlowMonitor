@@ -24,7 +24,7 @@ const Auth: React.FC = () => {
 
   const handleSignUp = async () => {
     setError(null);
-    const result : any = await SignUp(name, email, pass);
+    const result : any = await SignUp(name, email, pass, navigate);
     if (result?.message) setError(result);
   };
 
