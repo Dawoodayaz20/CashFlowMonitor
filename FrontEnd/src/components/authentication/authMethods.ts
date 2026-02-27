@@ -25,8 +25,8 @@ export const SignIn = async (email:string, password: string, navigate: any) => {
   }
 }
 
-export const SignUp = async (name : string, email : string, pass : string) => {
-  
+export const SignUp = async (name : string, email : string, pass : string, navigate: any) => {
+  const { setUser } = useAuthStore.getState();
   try {
     const response = await fetch('http://localhost:5000/api/auth/register', {
       method: 'POST',
@@ -42,8 +42,12 @@ export const SignUp = async (name : string, email : string, pass : string) => {
     
     // console.log('Response status:', response.status)
     const data = await response.json();
-    console.log('Backend Response:', data);
-    console.log('Status:', response.status);  // ADD THIS
+    if(response.ok){
+      setUser(data.user);
+      navigate('/dashboard')
+    }
+    console.log('Login response:', data);
+    return data;  // ADD THIS
 
   } catch (error) {
     console.error('Error:', error);
