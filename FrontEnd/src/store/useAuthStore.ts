@@ -9,16 +9,20 @@ interface User {
 
 interface AuthState  {
     user: User | null;
+    email: User | null;
     setUser: (user: User) => void;
     clearUser: () => void;
+    setEmail: (email: User) => void;
 }
 
 const useAuthStore = create<AuthState>()(
   persist(
     (set) => ({
       user: null,
+      email: null,
       setUser: (user) => set({ user }),
       clearUser: () => set({ user: null }),
+      setEmail: (email) => set({email})
     }),
     {
       name: 'auth-storage', // 👈 key in localStorage
