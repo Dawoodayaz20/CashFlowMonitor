@@ -3,6 +3,8 @@ import { Outlet, NavLink, useNavigate, useLocation } from "react-router-dom";
 import { SignOut } from "./components/authentication/authMethods";
 import AddTransactionModal from "./components/transactionModal/addTransaction";
 import useTransactionStore from "./store/useTransactionStore";
+import useAuthStore from "./store/useAuthStore";
+import { getInitials } from "./pages/ProfilePage/profilePage";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -47,6 +49,9 @@ const AppLayout: React.FC = () => {
   const navigate  = useNavigate();
   const location  = useLocation();
   const { addTransaction } = useTransactionStore();
+  const { user } = useAuthStore();
+
+  const initials = getInitials(user?.name)
 
   const pageInfo  = PAGE_TITLES[location.pathname] ?? { title: "Cash Flow Monitor", sub: "Overview" };
 
@@ -77,13 +82,21 @@ const AppLayout: React.FC = () => {
               fontSize:   collapsed ? 16 : 22,
               background: "linear-gradient(135deg, #0f766e, #14b8a6)",
             }}
-          >
-            😊
+          >{
+            user ?
+            `${initials}`
+          :
+          "😊"}
           </div>
 
           {!collapsed && (
             <span className="text-sm font-semibold text-gray-700 mt-1 mb-0.5 truncate w-full text-center">
-              Name
+              {
+              user ?
+              `${user?.name}`
+              :
+              "Name"
+              }
             </span>
           )}
 
