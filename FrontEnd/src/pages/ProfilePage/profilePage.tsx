@@ -225,14 +225,14 @@ const ProfilePage: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <InputField
               label="Full Name"
-              value=''
+              value={user?.name || ''}
               onChange={(v) => console.log(v)}
               placeholder="Your full name"
               disabled={!editingInfo}
             />
             <InputField
               label="Email Address"
-              value=''
+              value={user?.email || ''}
               onChange={(v) => console.log(v)}
               type="email"
               placeholder="your@email.com"
