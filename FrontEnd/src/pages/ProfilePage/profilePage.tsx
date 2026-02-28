@@ -178,15 +178,6 @@ const ProfilePage: React.FC = () => {
             >
               {initials}
             </div>
-            {/* Upload button — wired later */}
-            <button
-              className="absolute -bottom-2 -right-2 w-7 h-7 bg-white rounded-full
-                shadow-md flex items-center justify-center text-teal-700 text-xs
-                hover:bg-teal-50 transition border border-teal-100"
-              title="Upload photo (coming soon)"
-            >
-              📷
-            </button>
           </div>
 
           {/* Info */}
