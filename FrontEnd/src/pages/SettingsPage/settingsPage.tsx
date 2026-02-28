@@ -192,19 +192,12 @@ const SettingsPage: React.FC = () => {
     <div className="min-h-screen bg-gray-50">
 
       {/* ── Header ──────────────────────────────────────────────────────────── */}
-      <div
+      {/* <div
         className="px-8 py-6"
         style={{ background: "linear-gradient(135deg, #1e293b, #334155)" }}
       >
         <div className="flex items-center justify-between">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-widest text-white/50 mb-1">
-              Preferences
-            </p>
-            <h1 className="text-2xl font-bold text-white">Settings</h1>
-          </div>
-
-          {/* Save button */}
+         
           <button
             onClick={handleSave}
             className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm transition-all active:scale-95 ${
@@ -216,7 +209,7 @@ const SettingsPage: React.FC = () => {
             {saved ? "✓ Saved!" : "Save Changes"}
           </button>
         </div>
-      </div>
+      </div> */}
 
       {/* ── Page Body ────────────────────────────────────────────────────────── */}
       <div className="px-8 py-6 space-y-6 max-w-4xl">
@@ -293,6 +286,7 @@ const SettingsPage: React.FC = () => {
               </div>
             ))}
           </div>
+
         </Section>
 
         {/* ── Notifications ────────────────────────────────────────────────── */}
@@ -345,6 +339,19 @@ const SettingsPage: React.FC = () => {
                 </p>
               </div>
             )}
+            <div className="items-start justify-start">
+          {/* Save button */}
+          <button
+            onClick={handleSave}
+            className={`mt-10 flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm transition-all active:scale-95 bg-emerald-500 text-white mt-10${
+              saved
+                ? "bg-emerald-500 text-white hover:bg-emerald-300 shadow"
+                : "bg-white text-slate-700 hover:bg-emerald-300 shadow"
+            }`}
+          >
+            {saved ? "✓ Saved!" : "Save Changes"}
+          </button>
+          </div>
           </div>
         </Section>
 
