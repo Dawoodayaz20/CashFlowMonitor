@@ -63,7 +63,7 @@ const SummaryCard: React.FC<SummaryCardProps> = ({ label, value, accent = "neutr
 const Dashboard: React.FC = () => {
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   // const navigate = useNavigate();
-  const { transactions, fetchTransactions} = useTransactionStore();
+  const { transactions, fetchTransactions, loading} = useTransactionStore();
 
   useEffect(()=>{
     fetchTransactions();
@@ -101,8 +101,8 @@ const Dashboard: React.FC = () => {
   return months;
   };
 
-  console.log(chartData(transactions))
-
+  // console.log(chartData(transactions))
+  
   const recentTransactions = transactions
   .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
   .slice(0,5);
@@ -133,8 +133,8 @@ const Dashboard: React.FC = () => {
   const AvgIncome = (amount: number) : number => Math.round(amount/12);
   const AvgExpense = (amount: number) : number => Math.round(amount/12);
   
-  console.log(totalIncome)
-  console.log(AvgIncome(totalIncome))
+  // console.log(totalIncome)
+  // console.log(AvgIncome(totalIncome))
 
   return (
     <div className="flex w-full h-screen bg-gray-50 font-sans">
