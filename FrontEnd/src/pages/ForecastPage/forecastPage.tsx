@@ -10,29 +10,11 @@ import useTransactionStore from "../../store/useTransactionStore";
 
 type Horizon = 3 | 6 | 12;
 
-interface RecurringItem {
-  id: number;
-  label: string;
-  category: string;
-  type: "income" | "expense";
-  amount: number;
-  frequency: "weekly" | "monthly" | "yearly";
-}
-
 interface WhatIf {
   incomeChange: number;
   expenseChange: number;
   extraSavings: number;
 }
-
-const RECURRING_ITEMS: RecurringItem[] = [
-  { id: 1, label: "Salary",       category: "Salary",        type: "income",  amount: 3000, frequency: "monthly" },
-  { id: 2, label: "Freelance",    category: "Freelance",     type: "income",  amount: 500,  frequency: "monthly" },
-  { id: 3, label: "Rent",         category: "Rent",          type: "expense", amount: 900,  frequency: "monthly" },
-  { id: 4, label: "Netflix",      category: "Subscriptions", type: "expense", amount: 15,   frequency: "monthly" },
-  { id: 5, label: "Electricity",  category: "Utilities",     type: "expense", amount: 90,   frequency: "monthly" },
-  { id: 6, label: "Gym",          category: "Healthcare",    type: "expense", amount: 50,   frequency: "monthly" },
-];
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -45,7 +27,7 @@ const getMonthLabel = (offset: number): string => {
   return d.toLocaleDateString("en-US", { month: "short", year: "2-digit" });
 };
 
-const normalizeToMonthly = (amount: number, frequency: "weekly" | "monthly" | "yearly"): number => {
+const normalizeToMonthly = (amount: number, frequency: null | "weekly" | "monthly" | "yearly"): number => {
   if (frequency === "weekly")  return amount * 4.33;
   if (frequency === "yearly")  return amount / 12;
   return amount;
@@ -93,11 +75,16 @@ const ForecastPage: React.FC = () => {
   const totalExpenses = transactions
   .filter((tx) => tx.type ==='expense')
   .reduce((sum, tx) => sum + tx.amount, 0);
+
+  const distinctMonths = new Set(
+    transactions.map(tx => tx.date.slice(0, 7)) // "2024-01"
+  ).size;
+
   
   const CURRENT_BALANCE = totalIncome - totalExpenses;
   
-  const AVG_MONTHLY_INCOME  = totalIncome / 12;
-  const AVG_MONTHLY_EXPENSE = totalExpenses / 12;
+  const AVG_MONTHLY_INCOME  = totalIncome / (distinctMonths || 1);
+  const AVG_MONTHLY_EXPENSE = totalExpenses / (distinctMonths || 1);
 
   // ── Compute monthly net with what-if adjustments ──
   const adjustedIncome  = AVG_MONTHLY_INCOME  + whatIf.incomeChange;
@@ -119,13 +106,13 @@ const ForecastPage: React.FC = () => {
       });
     }
     return points;
-  }, [horizon, monthlyNet]);
+  }, [horizon, monthlyNet, CURRENT_BALANCE]);
 
   // ── Runway calculation ──
   const runway = useMemo(() => {
     if (monthlyNet >= 0) return null; // Growing — no depletion
     return Math.floor(CURRENT_BALANCE / Math.abs(monthlyNet));
-  }, [monthlyNet]);
+  }, [monthlyNet, CURRENT_BALANCE]);
 
   // ── Final projected balance ──
   const finalBalance = projectionData[projectionData.length - 1]?.balance ?? 0;
@@ -138,46 +125,17 @@ const ForecastPage: React.FC = () => {
     return { label: "Safe",       color: "text-emerald-600",bg: "bg-emerald-50",border: "border-emerald-200",dot: "bg-emerald-500" };
   }, [finalBalance, monthlyNet]);
 
-   // console.log(transactions.map((a) => {
-  //   if(a.recurring.isRecurring === true) return a.recurring;
-  //   return "Not recurring" 
-  // }))
-
-  const recurringTransaction = transactions.filter((tx) => tx.recurring.isRecurring === true); 
-  console.log(recurringTransaction);
+  const recurringTransaction = transactions.filter((tx) => tx.recurring.isRecurring === true);
 
   const recurringIncome : number = transactions
   .filter((tr) => tr.recurring.isRecurring === true && tr.type === 'income')
-  .reduce(( sum, tr,) => sum + tr.amount, 0)
+  .reduce(( sum, tr,) => sum + normalizeToMonthly(tr.amount, tr.recurring.frequency), 0)
 
   const recurringExpense : number = transactions
   .filter((tr) => tr.recurring.isRecurring === true && tr.type === 'expense')
-  .reduce((sum, tr) => sum + tr.amount, 0)
-
-  console.log(recurringExpense);
-
-  // ── Recurring totals ──
-  // const recurringIncome  = RECURRING_ITEMS
-  //   .filter(r => r.type === "income")
-  //   .reduce((s, r) => s + normalizeToMonthly(r.amount, r.frequency), 0);
-  // const recurringExpense = RECURRING_ITEMS
-  //   .filter(r => r.type === "expense")
-  //   .reduce((s, r) => s + normalizeToMonthly(r.amount, r.frequency), 0);
+  .reduce((sum, tr) => sum + normalizeToMonthly(tr.amount, tr.recurring.frequency), 0)
 
   const hasDeficit = projectionData.some(p => p.balance < 0);
-  
-  // console.log(transactions)
-  // console.log(recurrTransactions)
-
-   const montlhyyNet = transactions.map((tx) => {
-    const getMonth = new Date(tx.date).toLocaleString('default', { month: 'long' });
-    if(getMonth === 'January'){
-      return "The month is January"
-    }
-    return "The month is February"
-  })
-
-  console.log(montlhyyNet)
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -324,7 +282,11 @@ const ForecastPage: React.FC = () => {
                   tick={{ fontSize: 12, fill: "#94a3b8" }}
                   axisLine={false}
                   tickLine={false}
-                  tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`}
+                  tickFormatter={(v) => 
+                      Math.abs(v) >= 1000 
+                        ? `$${(v / 1000).toFixed(1)}k` 
+                        : `$${v}`
+                  }
                   width={48}
                 />
 
@@ -555,7 +517,7 @@ const ForecastPage: React.FC = () => {
             </div>
 
             <p className="text-xs text-gray-300 mt-4 text-center">
-              Forecast confidence based on {3} months of data
+              Forecast confidence based on {distinctMonths} months of data
             </p>
           </div>
         </div>
