@@ -1,9 +1,10 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid,
   Tooltip, ResponsiveContainer, ReferenceLine, Area,
   ComposedChart,
 } from "recharts";
+import useTransactionStore from "../../store/useTransactionStore";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -23,12 +24,6 @@ interface WhatIf {
   expenseChange: number;
   extraSavings: number;
 }
-
-// ─── Mock Data (replace with Zustand store later) ─────────────────────────────
-
-const CURRENT_BALANCE   = 4200;
-const AVG_MONTHLY_INCOME  = 3500;
-const AVG_MONTHLY_EXPENSE = 2100;
 
 const RECURRING_ITEMS: RecurringItem[] = [
   { id: 1, label: "Salary",       category: "Salary",        type: "income",  amount: 3000, frequency: "monthly" },
@@ -85,6 +80,25 @@ const ForecastPage: React.FC = () => {
     extraSavings:  0,
   });
 
+  const { transactions, fetchTransactions } = useTransactionStore();
+
+  useEffect(() => {
+    fetchTransactions()
+  }, [])
+
+  const totalIncome = transactions
+  .filter((tx) => tx.type === 'income')
+  .reduce((sum, tx) => sum = sum + tx.amount, 0);
+
+  const totalExpenses = transactions
+  .filter((tx) => tx.type ==='expense')
+  .reduce((sum, tx) => sum + tx.amount, 0);
+  
+  const CURRENT_BALANCE = totalIncome - totalExpenses;
+  
+  const AVG_MONTHLY_INCOME  = totalIncome / 12;
+  const AVG_MONTHLY_EXPENSE = totalExpenses / 12;
+
   // ── Compute monthly net with what-if adjustments ──
   const adjustedIncome  = AVG_MONTHLY_INCOME  + whatIf.incomeChange;
   const adjustedExpense = AVG_MONTHLY_EXPENSE + whatIf.expenseChange + whatIf.extraSavings;
@@ -118,21 +132,52 @@ const ForecastPage: React.FC = () => {
 
   // ── Risk level ──
   const riskLevel = useMemo(() => {
-    if (finalBalance < 0)       return { label: "Critical",  color: "text-rose-600",   bg: "bg-rose-50",   border: "border-rose-200",   dot: "bg-rose-500"   };
-    if (finalBalance < 1000)    return { label: "High Risk",  color: "text-orange-600", bg: "bg-orange-50", border: "border-orange-200", dot: "bg-orange-500" };
-    if (monthlyNet < 200)       return { label: "Moderate",   color: "text-yellow-600", bg: "bg-yellow-50", border: "border-yellow-200", dot: "bg-yellow-500" };
-    return                             { label: "Safe",       color: "text-emerald-600",bg: "bg-emerald-50",border: "border-emerald-200",dot: "bg-emerald-500" };
+    if (finalBalance < 0) return { label: "Critical",  color: "text-rose-600",   bg: "bg-rose-50",   border: "border-rose-200",   dot: "bg-rose-500"   };
+    if (finalBalance < 1000) return { label: "High Risk",  color: "text-orange-600", bg: "bg-orange-50", border: "border-orange-200", dot: "bg-orange-500" };
+    if (monthlyNet < 200) return { label: "Moderate",   color: "text-yellow-600", bg: "bg-yellow-50", border: "border-yellow-200", dot: "bg-yellow-500" };
+    return { label: "Safe",       color: "text-emerald-600",bg: "bg-emerald-50",border: "border-emerald-200",dot: "bg-emerald-500" };
   }, [finalBalance, monthlyNet]);
 
+   // console.log(transactions.map((a) => {
+  //   if(a.recurring.isRecurring === true) return a.recurring;
+  //   return "Not recurring" 
+  // }))
+
+  const recurringTransaction = transactions.filter((tx) => tx.recurring.isRecurring === true); 
+  console.log(recurringTransaction);
+
+  const recurringIncome : number = transactions
+  .filter((tr) => tr.recurring.isRecurring === true && tr.type === 'income')
+  .reduce(( sum, tr,) => sum + tr.amount, 0)
+
+  const recurringExpense : number = transactions
+  .filter((tr) => tr.recurring.isRecurring === true && tr.type === 'expense')
+  .reduce((sum, tr) => sum + tr.amount, 0)
+
+  console.log(recurringExpense);
+
   // ── Recurring totals ──
-  const recurringIncome  = RECURRING_ITEMS
-    .filter(r => r.type === "income")
-    .reduce((s, r) => s + normalizeToMonthly(r.amount, r.frequency), 0);
-  const recurringExpense = RECURRING_ITEMS
-    .filter(r => r.type === "expense")
-    .reduce((s, r) => s + normalizeToMonthly(r.amount, r.frequency), 0);
+  // const recurringIncome  = RECURRING_ITEMS
+  //   .filter(r => r.type === "income")
+  //   .reduce((s, r) => s + normalizeToMonthly(r.amount, r.frequency), 0);
+  // const recurringExpense = RECURRING_ITEMS
+  //   .filter(r => r.type === "expense")
+  //   .reduce((s, r) => s + normalizeToMonthly(r.amount, r.frequency), 0);
 
   const hasDeficit = projectionData.some(p => p.balance < 0);
+  
+  // console.log(transactions)
+  // console.log(recurrTransactions)
+
+   const montlhyyNet = transactions.map((tx) => {
+    const getMonth = new Date(tx.date).toLocaleString('default', { month: 'long' });
+    if(getMonth === 'January'){
+      return "The month is January"
+    }
+    return "The month is February"
+  })
+
+  console.log(montlhyyNet)
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -361,9 +406,9 @@ const ForecastPage: React.FC = () => {
 
             {/* List */}
             <div className="space-y-2">
-              {RECURRING_ITEMS.map((item) => (
+              {recurringTransaction.map((item) => (
                 <div
-                  key={item.id}
+                  key={item._id}
                   className="flex items-center justify-between px-4 py-3 rounded-xl border border-gray-100 hover:bg-gray-50 transition"
                 >
                   <div className="flex items-center gap-3">
@@ -373,8 +418,8 @@ const ForecastPage: React.FC = () => {
                       {item.type === "income" ? "💰" : "💸"}
                     </div>
                     <div>
-                      <p className="text-sm font-semibold text-gray-700 leading-tight">{item.label}</p>
-                      <p className="text-xs text-gray-400 capitalize">{item.frequency}</p>
+                      <p className="text-sm font-semibold text-gray-700 leading-tight">{item.category}</p>
+                      <p className="text-xs text-gray-400 capitalize">{item.recurring.frequency}</p>
                     </div>
                   </div>
                   <span className={`text-sm font-bold ${
