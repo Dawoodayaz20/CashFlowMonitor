@@ -1,7 +1,7 @@
 import './App.css';
 import './index.css';
 import { useEffect } from 'react';
-import Dashboard from './components/dashboard/DashboardPage';
+import Dashboard from './pages/Dashboard/DashboardPage';
 import Auth from './components/authentication/AuthPage';
 import TransactionPage from './components/TransactionPage/transactionPage';
 import ForecastPage from './pages/ForecastPage/forecastPage';
