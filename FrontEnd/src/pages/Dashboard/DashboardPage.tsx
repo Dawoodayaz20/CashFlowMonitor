@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import AreaChartComp from "../../components/dashboard/AreaChart";
 import AddTransactionModal from "../../components/transactionModal/addTransaction";
@@ -8,7 +8,6 @@ import useSettingsStore from "../../store/useSettingsStore";
 import useFormatters from "../../useFormatters";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
-
 interface TransactionForm {
   type: "income" | "expense";
   amount: string;
@@ -25,6 +24,60 @@ interface transactionDataInt {
   income: number,
   expense: number
 }
+
+// ─── Budget Status Helper ─────────────────────────────────────────────────────
+
+type BudgetStatus = "over" | "near" | "safe";
+
+const buildBudgetStatus = (
+  transactions: Transaction[],
+  budgetLimits: Record<string, number>
+): Record<string, BudgetStatus> => {
+  // Use the most recent transaction's month instead of today's month
+  const latestDate = transactions.reduce((latest, tx) => {
+    const d = new Date(tx.date);
+    return d > latest ? d : latest;
+  }, new Date(0));
+
+  const thisMonth = latestDate.getMonth();
+  const thisYear  = latestDate.getFullYear();
+
+  // Sum expenses per category for current month only
+  const spent: Record<string, number> = {};
+  transactions.forEach((tx) => {
+    if (tx.type !== "expense") return;
+    const d = new Date(tx.date);
+    if (d.getMonth() !== thisMonth || d.getFullYear() !== thisYear) return;
+    spent[tx.category] = (spent[tx.category] ?? 0) + tx.amount;
+  });
+
+  // Build status map
+  const status: Record<string, BudgetStatus> = {};
+  Object.entries(budgetLimits).forEach(([cat, limit]) => {
+    if (!limit) return;
+    const ratio = (spent[cat] ?? 0) / limit;
+    if      (ratio >= 1.0) status[cat] = "over";
+    else if (ratio >= 0.8) status[cat] = "near";
+    else                   status[cat] = "safe";
+  });
+
+  return status;
+};
+
+// ─── Budget Badge ─────────────────────────────────────────────────────────────
+
+const BudgetBadge: React.FC<{ status: BudgetStatus }> = ({ status }) => {
+  if (status === "safe") return null;
+  return (
+    <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
+      status === "over"
+        ? "bg-rose-100 text-rose-600"
+        : "bg-amber-100 text-amber-600"
+    }`}>
+      {status === "over" ? "⚠ Over budget" : "● Near limit"}
+    </span>
+  );
+};
 
 // ─── Summary Card ─────────────────────────────────────────────────────────────
 
@@ -66,6 +119,13 @@ const Dashboard: React.FC = () => {
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   // const navigate = useNavigate();
   const { transactions, fetchTransactions, loading} = useTransactionStore();
+  const { settings } = useSettingsStore();
+  const { formatCurrency, formatDate } = useFormatters();
+
+  const budgetStatus = useMemo(
+    () => buildBudgetStatus(transactions, settings.budgetLimits),
+    [transactions, settings.budgetLimits]
+  );
 
   useEffect(()=>{
     fetchTransactions();
@@ -149,10 +209,10 @@ const Dashboard: React.FC = () => {
 
           {/* ── Summary Cards ──────────────────────────────────────────────── */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            <SummaryCard label="Total Balance"     value={`$${totalBalance}`}   accent="neutral"  icon="🏦" />
-            <SummaryCard label="Income"            value={`$${totalIncome}`}   accent="teal"     icon="💰" />
-            <SummaryCard label="Expenses"          value={`$${totalExpense}`}     accent="rose"     icon="💸" />
-            <SummaryCard label="Net Monthly"       value={`$${totalIncome}`} accent="positive" icon="📈" />
+            <SummaryCard label="Total Balance"     value={formatCurrency(totalBalance)}   accent="neutral"  icon="🏦" />
+            <SummaryCard label="Income"            value={formatCurrency(totalIncome)}    accent="teal"     icon="💰" />
+            <SummaryCard label="Expenses"          value={formatCurrency(totalExpense)}   accent="rose"     icon="💸" />
+            <SummaryCard label="Net Monthly"       value={formatCurrency(totalIncome)}    accent="positive" icon="📈" />
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-stretch">
@@ -203,8 +263,13 @@ const Dashboard: React.FC = () => {
                           {tx.type === "income" ? "💰" : "💸"}
                         </div>
                         <div>
-                          <p className="text-sm font-semibold text-gray-700 leading-tight">{tx.note}</p>
-                          <p className="text-xs text-gray-400">{new Date(tx.date).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</p>
+                          <div className="flex items-center gap-2 leading-tight">
+                            <p className="text-sm font-semibold text-gray-700">{tx.note}</p>
+                            {tx.type === "expense" && budgetStatus[tx.category] && (
+                              <BudgetBadge status={budgetStatus[tx.category]} />
+                            )}
+                          </div>
+                          <p className="text-xs text-gray-400">{formatDate(tx.date)}</p>
                         </div>
                       </div>
 
@@ -214,7 +279,7 @@ const Dashboard: React.FC = () => {
                           tx.type === "income" ? "text-teal-600" : "text-rose-500"
                         }`}
                       >
-                        {tx.type === "income" ? "+" : "-"}${tx.amount.toLocaleString()}
+                        {tx.type === "income" ? "+" : "-"}{formatCurrency(tx.amount)}
                       </span>
                     </div>
                   ))}
@@ -243,9 +308,9 @@ const Dashboard: React.FC = () => {
           {/* ── Monthly Summary Cards ──────────────────────────────────────── */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             {[
-              { label: "Avg Income",       value: `$${AvgIncome(totalIncome)}`,   icon: "📊", accent: "teal"     as const },
-              { label: "Avg Expenses",     value: `$${AvgExpense(totalExpense)}`,     icon: "🧾", accent: "rose"     as const },
-              { label: "Monthly Net",      value: `$${AvgExpense(totalBalance)}`,  icon: "💹", accent: "positive" as const },
+              { label: "Avg Income",       value: formatCurrency(AvgIncome(totalIncome)),   icon: "📊", accent: "teal"     as const },
+              { label: "Avg Expenses",     value: formatCurrency(AvgExpense(totalExpense)),  icon: "🧾", accent: "rose"     as const },
+              { label: "Monthly Net",      value: formatCurrency(AvgExpense(totalBalance)),  icon: "💹", accent: "positive" as const },
               { label: "Survival Months",  value: "8 months", icon: "🛡️", accent: "neutral"  as const },
             ].map((item) => (
               <SummaryCard key={item.label} label={item.label} value={item.value} icon={item.icon} accent={item.accent} />
