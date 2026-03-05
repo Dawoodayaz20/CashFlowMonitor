@@ -1,16 +1,18 @@
 import React, { useState } from "react";
+import useSettingsStore from "../../store/useSettingsStore";
+import type { Currency, DateFormat, BudgetLimits } from "../../store/useSettingsStore";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 interface GeneralSettings {
-  currency: string;
-  dateFormat: string;
+  currency: Currency;
+  dateFormat: DateFormat;
   defaultPage: string;
 }
 
-interface BudgetLimits {
-  [category: string]: number;
-}
+// interface BudgetLimits {
+//   [category: string]: number;
+// }
 
 interface NotificationSettings {
   lowBalanceAlert: boolean;
@@ -165,11 +167,17 @@ const SettingsPage: React.FC = () => {
   });
 
   const [showClearConfirm, setShowClearConfirm] = useState(false);
+  const { saveSettings } = useSettingsStore();
   const [saved, setSaved] = useState(false);
 
   // ── Handlers ──
   const handleSave = () => {
-    console.log("Settings saved:", { general, budgets, notifications });
+    saveSettings({
+  currency:      general.currency,
+  dateFormat:    general.dateFormat,
+  defaultPage:   general.defaultPage,
+  budgetLimits:  budgets,
+  notifications: notifications });
     // → wire to backend / localStorage later
     setSaved(true);
     setTimeout(() => setSaved(false), 2500);
@@ -225,13 +233,13 @@ const SettingsPage: React.FC = () => {
               label="Currency"
               value={general.currency}
               options={CURRENCIES}
-              onChange={(v) => setGeneral(p => ({ ...p, currency: v }))}
+              onChange={(v) => setGeneral(p => ({ ...p, currency: v as Currency }))}
             />
             <SelectField
               label="Date Format"
               value={general.dateFormat}
               options={DATE_FORMATS}
-              onChange={(v) => setGeneral(p => ({ ...p, dateFormat: v }))}
+              onChange={(v) => setGeneral(p => ({ ...p, dateFormat: v as DateFormat }))}
             />
             <SelectField
               label="Default Landing Page"
