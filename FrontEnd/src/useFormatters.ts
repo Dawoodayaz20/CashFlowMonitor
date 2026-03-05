@@ -4,11 +4,11 @@ import type { Currency, DateFormat } from './store/useSettingsStore';
 // ─── Currency Symbol Map ──────────────────────────────────────────────────────
 
 const CURRENCY_SYMBOLS: Record<Currency, string> = {
-  USD: "$",
-  EUR: "€",
-  GBP: "£",
-  PKR: "Rs",
-  AED: "د.إ",
+  USD: "$ ",
+  EUR: "€ ",
+  GBP: "£ ",
+  PKR: "₨ ",
+  AED: "د.إ ",
 };
 
 // ─── Date Formatter ───────────────────────────────────────────────────────────
