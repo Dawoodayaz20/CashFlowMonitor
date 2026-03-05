@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import useSettingsStore from "../../store/useSettingsStore";
 import type { Currency, DateFormat, BudgetLimits } from "../../store/useSettingsStore";
 
@@ -9,10 +9,6 @@ interface GeneralSettings {
   dateFormat: DateFormat;
   defaultPage: string;
 }
-
-// interface BudgetLimits {
-//   [category: string]: number;
-// }
 
 interface NotificationSettings {
   lowBalanceAlert: boolean;
@@ -141,10 +137,26 @@ const SelectField: React.FC<{
 
 const SettingsPage: React.FC = () => {
 
+  const { settings, saveSettings, fetchSettings } = useSettingsStore();
+
+  useEffect(() => {
+    fetchSettings();
+  }, []);
+
+  useEffect(() => {
+  setGeneral({
+    currency:    settings.currency,
+    dateFormat:  settings.dateFormat,
+    defaultPage: settings.defaultPage,
+  });
+  setBudgets(settings.budgetLimits);
+  setNotifications(settings.notifications);
+  }, [settings]);
+
   // ── State ──
   const [general, setGeneral] = useState<GeneralSettings>({
-    currency:    "USD",
-    dateFormat:  "MM/DD/YYYY",
+    currency:    `${settings ? settings.currency : "USD"}`,
+    dateFormat:  settings.dateFormat,
     defaultPage: "/dashboard",
   });
 
@@ -167,7 +179,6 @@ const SettingsPage: React.FC = () => {
   });
 
   const [showClearConfirm, setShowClearConfirm] = useState(false);
-  const { saveSettings } = useSettingsStore();
   const [saved, setSaved] = useState(false);
 
   // ── Handlers ──
