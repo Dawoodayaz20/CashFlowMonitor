@@ -5,7 +5,7 @@ import { create } from "zustand";
 export type Currency   = "USD" | "EUR" | "GBP" | "PKR" | "AED";
 export type DateFormat = "MM/DD/YYYY" | "DD/MM/YYYY" | "YYYY-MM-DD";
 
-export interface BudgetLimits {
+export interface CurrencyBudgetLimits {
   Rent:          number;
   Food:          number;
   Transport:     number;
@@ -39,9 +39,9 @@ const DEFAULT_SETTINGS: AppSettings = {
   dateFormat:  "MM/DD/YYYY",
   defaultPage: "/dashboard",
   budgetLimits: {
-    Rent:          900,
+    Rent:          100,
     Food:          300,
-    Transport:     150,
+    Transport:     100,
     Utilities:     100,
     Healthcare:    100,
     Entertainment: 80,
@@ -50,7 +50,7 @@ const DEFAULT_SETTINGS: AppSettings = {
   },
   notifications: {
     lowBalanceAlert:     true,
-    lowBalanceThreshold: 500,
+    lowBalanceThreshold: 100,
     monthlySummary:      true,
     recurringReminders:  false,
   },
