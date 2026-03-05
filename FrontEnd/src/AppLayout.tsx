@@ -1,10 +1,12 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Outlet, NavLink, useNavigate, useLocation } from "react-router-dom";
 import { SignOut } from "./components/authentication/authMethods";
 import AddTransactionModal from "./components/transactionModal/addTransaction";
 import useTransactionStore from "./store/useTransactionStore";
 import useAuthStore from "./store/useAuthStore";
 import { getInitials } from "./pages/ProfilePage/profilePage";
+import useSettingsStore from "./store/useSettingsStore";
+import useFormatters from "./useFormatters";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -50,8 +52,13 @@ const AppLayout: React.FC = () => {
   const location  = useLocation();
   const { addTransaction } = useTransactionStore();
   const { user } = useAuthStore();
+  const { fetchSettings } = useSettingsStore();
 
   const initials = getInitials(user?.name)
+
+  useEffect(() => {
+    fetchSettings();
+  }, [])
 
   const pageInfo  = PAGE_TITLES[location.pathname] ?? { title: "Cash Flow Monitor", sub: "Overview" };
 
