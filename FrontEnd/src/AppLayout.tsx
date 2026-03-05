@@ -6,7 +6,6 @@ import useTransactionStore from "./store/useTransactionStore";
 import useAuthStore from "./store/useAuthStore";
 import { getInitials } from "./pages/ProfilePage/profilePage";
 import useSettingsStore from "./store/useSettingsStore";
-import useFormatters from "./useFormatters";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
