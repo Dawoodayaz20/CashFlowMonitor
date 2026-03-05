@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import AreaChartComp from "../../components/dashboard/AreaChart";
+import AreaChartComp from "../../components/areaChartComp/AreaChart";
 import AddTransactionModal from "../../components/transactionModal/addTransaction";
 import useTransactionStore from "../../store/useTransactionStore";
 import type { Transaction } from "../../../types";
