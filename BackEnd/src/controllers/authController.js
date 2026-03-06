@@ -87,7 +87,47 @@ const logout = async(req, res) => {
   }
   catch(err){
     console.log("Error while logging out!",err)
-  };
+  }
+};
+
+const updateProfile = async(req, res) => {
+  try{
+    const { name, email, password, newPassword } = req.body;
+
+    const user = await User.findById(req.userId);
+    if(!user) {
+      return res.status(404).json({message: 'User not found!'})
+    }
+
+    if(newPassword){
+      if(!currentPassword) {
+        return res.status(400).json({message: "Current password required!"});
+      }
+
+      const isMatch = await user.comparePassword(currentPassword);
+      if(!isMatch){
+        return res.status(401).json({ message: "Current password is incorrect!"})
+      }
+      user.password = newPassword;
+    }
+
+    if (name) user.name = name;
+    if (email) user.email = email;
+
+    await user.save();
+
+    res.json({
+      message: 'Profile updated successfully',
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email
+      }
+    });
+  }
+  catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
 }
 
-module.exports = { register, login, logout };
+module.exports = { register, login, logout, updateProfile };
