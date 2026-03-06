@@ -1,5 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import useAuthStore from "../../store/useAuthStore";
+import useTransactionStore from "../../store/useTransactionStore";
+import { updateProfile } from "../../authentication/authMethods";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -28,7 +30,7 @@ export const getInitials = (name: string | undefined | null): string => {
   return (firstInitial + lastInitial).toUpperCase();
 };
 
-const formatMemberSince = (date: string): string =>
+const formatMemberSince = (date: string | number): string =>
   new Date(date).toLocaleDateString("en-US", { month: "long", year: "numeric" });
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
@@ -93,18 +95,14 @@ const InputField: React.FC<{
 
 const ProfilePage: React.FC = () => {
 
-  // Pull from auth store — replace mock values once backend is wired
-  // const { user } = useAuthStore();
-  const MOCK_USER = {
-    name:        "Ahmed Khan",
-    email:       "ahmed@example.com",
-    phone:       "+92 300 1234567",
-    memberSince: "2025-09-01",
-    plan:        "Free",
-  };
-
   // ── State ──
   const { user } = useAuthStore();
+  const { transactions, fetchTransactions } = useTransactionStore();
+
+  const [info, setInfo] = useState<PersonalInfo>({
+    name:  user?.name ?? "",
+    email: user?.email ?? "",
+  });
 
   const [passwords, setPasswords] = useState<PasswordForm>({
     current: "",
@@ -112,6 +110,10 @@ const ProfilePage: React.FC = () => {
     confirm: "",
   });
 
+  useEffect(() => {
+    fetchTransactions();
+  }, [])
+  
   const [pwErrors, setPwErrors] = useState<Partial<PasswordForm>>({});
   const [showPasswords, setShowPasswords] = useState<Record<string, boolean>>({});
   const [infoSaved, setInfoSaved] = useState(false);
@@ -123,13 +125,13 @@ const ProfilePage: React.FC = () => {
 //   const { user } = useAuthStore();
 
   // ── Handlers ──
-//   const handleSaveInfo = () => {
-//     console.log("Save personal info:", info);
-//     // → wire to backend later
-//     setInfoSaved(true);
-//     setEditingInfo(false);
-//     setTimeout(() => setInfoSaved(false), 2500);
-//   };
+  // const handleSaveInfo = () => {
+  //   console.log("Save personal info:", info);
+  //   // → wire to backend later
+  //   setInfoSaved(true);
+  //   setEditingInfo(false);
+  //   setTimeout(() => setInfoSaved(false), 2500);
+  // };
 
   const validatePasswords = (): boolean => {
     const errs: Partial<PasswordForm> = {};
@@ -148,6 +150,19 @@ const ProfilePage: React.FC = () => {
     setPasswords({ current: "", next: "", confirm: "" });
     setTimeout(() => setPwSaved(false), 2500);
   };
+
+  const handleSaveInfo = async () => {
+  const result = await updateProfile(info.name, info.email);
+    if (result.success) {
+      setInfoSaved(true);
+      setEditingInfo(false);
+      setTimeout(() => setInfoSaved(false), 2500);
+    } else {
+      console.error("Failed to update profile:", result.message);
+      // optionally show an error message to the user
+    }
+  };
+
 
   const handleDeleteAccount = () => {
     console.log("Delete account triggered");
@@ -186,11 +201,11 @@ const ProfilePage: React.FC = () => {
             <p className="text-sm text-white/70 mt-0.5 truncate">{user?.email}</p>
             <div className="flex items-center gap-3 mt-3 flex-wrap">
               <span className="px-3 py-1 rounded-full bg-white/20 border border-white/20 text-xs font-semibold text-white/90">
-                {MOCK_USER.plan} Plan
+                Free Plan
               </span>
-              <span className="text-xs text-white/60">
-                Member since {formatMemberSince(MOCK_USER.memberSince)}
-              </span>
+              {/* <span className="text-xs text-white/60">
+                Member since {formatMemberSince(user?.createdAt as any)}
+              </span> */}
             </div>
           </div>
 
@@ -198,11 +213,11 @@ const ProfilePage: React.FC = () => {
           <div className="hidden md:flex flex-col gap-3 shrink-0 text-right">
             <div>
               <p className="text-xs text-white/50 uppercase tracking-wider">Transactions</p>
-              <p className="text-xl font-bold text-white">—</p>
+              <p className="text-xl font-bold text-white">{transactions.length}</p>
             </div>
             <div>
               <p className="text-xs text-white/50 uppercase tracking-wider">Since Joined</p>
-              <p className="text-xl font-bold text-white">—</p>
+              <p className="text-xl font-bold text-white">{formatMemberSince(user?.createdAt as any)}</p>
             </div>
           </div>
         </div>
@@ -216,14 +231,14 @@ const ProfilePage: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <InputField
               label="Full Name"
-              value={user?.name || ''}
-              onChange={(v) => console.log(v)}
+              value={info.name}
+              onChange={(v) => setInfo(p => ({ ...p, name: v }))}
               placeholder="Your full name"
               disabled={!editingInfo}
             />
             <InputField
               label="Email Address"
-              value={user?.email || ''}
+              value={info.email}
               onChange={(v) => console.log(v)}
               type="email"
               placeholder="your@email.com"
@@ -242,9 +257,9 @@ const ProfilePage: React.FC = () => {
                 Account Plan
               </label>
               <div className="flex items-center gap-2 px-4 py-2.5 border border-gray-200 rounded-xl bg-gray-50">
-                <span className="text-sm text-gray-500">{MOCK_USER.plan}</span>
-                <span className="ml-auto text-xs font-semibold text-teal-600 hover:underline cursor-pointer">
-                  Upgrade →
+                <span className="text-sm text-gray-500">Free</span>
+                <span title="(coming soon!)" className="ml-auto text-xs font-semibold text-teal-600 hover:underline cursor-pointer">
+                Upgrade →
                 </span>
               </div>
             </div>
@@ -262,7 +277,7 @@ const ProfilePage: React.FC = () => {
             ) : (
               <>
                 <button
-                  onClick={(() => console.log("hello"))}
+                  onClick={(handleSaveInfo)}
                   className={`px-5 py-2.5 rounded-xl text-sm font-semibold text-white shadow transition-all active:scale-95 ${
                     infoSaved ? "bg-emerald-500" : "bg-teal-600 hover:bg-teal-700"
                   }`}
