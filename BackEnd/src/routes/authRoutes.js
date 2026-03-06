@@ -13,6 +13,8 @@ router.get('/verify', authMiddleware, (req, res) => {
     res.json({ valid: true, userId: req.userId });
 });
 
+router.put('/profile', authMiddleware, updateProfile);
+
 router.post('/logout', logout);
 
 module.exports = router;
