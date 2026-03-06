@@ -19,9 +19,30 @@ const register = async (req, res) => {
     const user = new User({ name, email, password });
     await user.save(); // Password gets hashed automatically here
 
+    // Generate JWT
+    const token = jwt.sign(
+      { userId: user._id }, 
+      process.env.JWT_SECRET,
+      { expiresIn: process.env.JWT_EXPIRE }
+    );
+
+    // Send token in httpOnly cookie
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
+    });
+
     res.status(201).json({ 
       message: 'User registered successfully',
-      userId: user._id 
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        createdAt: user.createdAt
+      }
+
     });
 
   } catch (error) {
