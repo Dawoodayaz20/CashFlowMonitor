@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Outlet, NavLink, useNavigate, useLocation } from "react-router-dom";
-import { SignOut } from "./components/authentication/authMethods";
+import { SignOut } from "./authentication/authMethods";
 import AddTransactionModal from "./components/transactionModal/addTransaction";
 import useTransactionStore from "./store/useTransactionStore";
 import useAuthStore from "./store/useAuthStore";
