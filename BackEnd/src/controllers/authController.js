@@ -113,7 +113,7 @@ const logout = async(req, res) => {
 
 const updateProfile = async(req, res) => {
   try{
-    const { name, email, password, newPassword } = req.body;
+    const { name, email, currentPassword, newPassword } = req.body;
 
     const user = await User.findById(req.userId);
     if(!user) {
