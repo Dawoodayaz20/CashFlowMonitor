@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import useAuthStore from "../../store/useAuthStore";
 import useTransactionStore from "../../store/useTransactionStore";
 import { updateProfile } from "../../authentication/authMethods";
+import DeleteAccountModal from "./deleteAccountModal";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -120,18 +121,12 @@ const ProfilePage: React.FC = () => {
   const [pwSaved, setPwSaved] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [editingInfo, setEditingInfo] = useState(false);
+  const [ modalOpen, setModalOpen ] = useState<boolean>(false);
 
   const initials = getInitials(user?.name);
 //   const { user } = useAuthStore();
 
   // ── Handlers ──
-  // const handleSaveInfo = () => {
-  //   console.log("Save personal info:", info);
-  //   // → wire to backend later
-  //   setInfoSaved(true);
-  //   setEditingInfo(false);
-  //   setTimeout(() => setInfoSaved(false), 2500);
-  // };
 
   const validatePasswords = (): boolean => {
     const errs: Partial<PasswordForm> = {};
@@ -142,13 +137,16 @@ const ProfilePage: React.FC = () => {
     return Object.keys(errs).length === 0;
   };
 
-  const handleChangePassword = () => {
+  const handleChangePassword = async () => {
     if (!validatePasswords()) return;
-    console.log("Change password triggered");
-    // → wire to backend later
-    setPwSaved(true);
-    setPasswords({ current: "", next: "", confirm: "" });
-    setTimeout(() => setPwSaved(false), 2500);
+    
+    const result = await updateProfile(undefined, undefined, passwords.current, passwords.next)
+    
+    if(result){
+      setPwSaved(true);
+      setPasswords({ current: "", next: "", confirm: "" });
+      setTimeout(() => setPwSaved(false), 2500);
+    }
   };
 
   const handleSaveInfo = async () => {
@@ -239,19 +237,11 @@ const ProfilePage: React.FC = () => {
             <InputField
               label="Email Address"
               value={info.email}
-              onChange={(v) => console.log(v)}
+              onChange={(v) => setInfo(p => ({ ...p, email: v }))}
               type="email"
               placeholder="your@email.com"
               disabled={!editingInfo}
             />
-            {/* <InputField
-              label="Phone Number"
-              value={info.phone}
-              onChange={(v) => setInfo(p => ({ ...p, phone: v }))}
-              placeholder="+1 000 0000000"
-              disabled={!editingInfo}
-            /> */}
-            {/* Account type — always read only */}
             <div>
               <label className="block text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1.5">
                 Account Plan
@@ -452,7 +442,7 @@ const ProfilePage: React.FC = () => {
                   Cancel
                 </button>
                 <button
-                  onClick={handleDeleteAccount}
+                  onClick={() => setModalOpen(true)}
                   className="px-3 py-2 rounded-xl text-sm font-semibold bg-rose-600 text-white hover:bg-rose-700 transition active:scale-95"
                 >
                   Yes, delete
@@ -461,6 +451,12 @@ const ProfilePage: React.FC = () => {
             )}
           </div>
         </Section>
+
+        <DeleteAccountModal
+          isOpen={modalOpen}
+          onClose={() => setModalOpen(false)}
+          onConfirm={handleDeleteAccount}
+        />
 
       </div>
     </div>
