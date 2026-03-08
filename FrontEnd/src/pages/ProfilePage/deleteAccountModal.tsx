@@ -1,4 +1,6 @@
 import { useState, useEffect, useRef } from "react";
+import { deleteAccount } from "../../authentication/authMethods";
+import { useNavigate } from "react-router-dom";
 
 interface DeleteAccountModalProps {
   isOpen: boolean;
@@ -18,6 +20,7 @@ export default function DeleteAccountModal({
   const [isShaking, setIsShaking] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (isOpen) {
@@ -38,20 +41,25 @@ export default function DeleteAccountModal({
     setTimeout(() => setIsShaking(false), 500);
   };
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     if (!password.trim()) {
       setError("Please enter your password.");
       triggerShake();
       return;
     }
-    if (password !== CORRECT_PASSWORD) {
-      setError("Incorrect password. Please try again.");
-      triggerShake();
-      setPassword("");
-      return;
-    }
+    // if (password !== CORRECT_PASSWORD) {
+    //   setError("Incorrect password. Please try again.");
+    //   triggerShake();
+    //   setPassword("");
+    //   return;
+    // }
     onConfirm();
-    onClose();
+    try{
+      const result = await deleteAccount(password, navigate);
+      if(result) onClose();
+    } catch(err){
+      console.log(err)
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
