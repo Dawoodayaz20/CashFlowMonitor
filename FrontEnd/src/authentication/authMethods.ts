@@ -102,3 +102,30 @@ export const updateProfile = async(
     return { success: false, message: 'Network error' };
   }
 };
+
+export const deleteAccount = async (password: string, navigate: any) => {
+  const { clearUser } = useAuthStore.getState();
+
+  try {
+    const response = await fetch('http://localhost:5000/api/auth/account', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ password })
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      clearUser(); // Clear Zustand store
+      navigate('/'); // Redirect to login/home
+      return { success: true, message: data.message };
+    } else {
+      return { success: false, message: data.message };
+    }
+
+  } catch (error) {
+    console.error('Delete account error:', error);
+    return { success: false, message: 'Network error' };
+  }
+};
