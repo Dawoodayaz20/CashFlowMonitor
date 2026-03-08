@@ -151,7 +151,7 @@ const updateProfile = async(req, res) => {
   }
 }
 
-const deleteAccount = async (res, req) => {
+const deleteAccount = async (req, res) => {
   try{
     const { password } = req.body;
 
@@ -176,7 +176,7 @@ const deleteAccount = async (res, req) => {
     res.json({ message: 'Account deleted successfully' });
 
   } catch(err) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(500).json({ message: 'Server error', error: err.message });
   };
 }
 
