@@ -151,4 +151,33 @@ const updateProfile = async(req, res) => {
   }
 }
 
-module.exports = { register, login, logout, updateProfile };
+const deleteAccount = async (res, req) => {
+  try{
+    const { password } = req.body;
+
+    const user = await User.findById(req.userId);
+    if(!user){
+      return res.status(404).json({ message: 'User not found' });
+    };
+
+    const isMatch = await user.comparePassword(password);
+    if (!isMatch) {
+      return res.status(401).json({ message: 'Incorrect password' });
+    };
+
+    await User.findByIdAndDelete(req.userId);
+
+    res.clearCookie('token', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict'
+    });
+
+    res.json({ message: 'Account deleted successfully' });
+
+  } catch(err) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  };
+}
+
+module.exports = { register, login, logout, updateProfile, deleteAccount };
