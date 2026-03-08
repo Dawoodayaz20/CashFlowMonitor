@@ -3,6 +3,7 @@ import useAuthStore from "../../store/useAuthStore";
 import useTransactionStore from "../../store/useTransactionStore";
 import { updateProfile } from "../../authentication/authMethods";
 import DeleteAccountModal from "./deleteAccountModal";
+import { deleteAccount } from "../../authentication/authMethods";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -159,13 +160,6 @@ const ProfilePage: React.FC = () => {
       console.error("Failed to update profile:", result.message);
       // optionally show an error message to the user
     }
-  };
-
-
-  const handleDeleteAccount = () => {
-    console.log("Delete account triggered");
-    // → wire to backend later
-    setShowDeleteConfirm(false);
   };
 
   const toggleShowPassword = (field: string) =>
@@ -455,7 +449,7 @@ const ProfilePage: React.FC = () => {
         <DeleteAccountModal
           isOpen={modalOpen}
           onClose={() => setModalOpen(false)}
-          onConfirm={handleDeleteAccount}
+          onConfirm={() => setShowDeleteConfirm(false)}
         />
 
       </div>
