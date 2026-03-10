@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import useFormatters from "../../useFormatters";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -41,6 +42,7 @@ const today = new Date().toISOString().split("T")[0];
 // ─── Component ────────────────────────────────────────────────────────────────
 
 const AddTransactionModal: React.FC<AddTransactionModalProps> = ({ isOpen, onClose, onSubmit, initialData }) => {
+const { currencySymbol } = useFormatters();  
   const [form, setForm] = useState<TransactionForm>({
     type: "income",
     amount: "",
@@ -146,7 +148,7 @@ const AddTransactionModal: React.FC<AddTransactionModalProps> = ({ isOpen, onClo
               Amount
             </label>
             <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 font-semibold">$</span>
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 font-semibold">{currencySymbol}</span>
               <input
                 type="number"
                 min="0"
@@ -161,7 +163,7 @@ const AddTransactionModal: React.FC<AddTransactionModalProps> = ({ isOpen, onClo
                 }`}
               />
             </div>
-            {errors.amount && <p className="mt-1 text-xs text-rose-500">{errors.amount}</p>}
+            {errors.amount && <p className="mt-1 text-xs text-rose-500">${errors.amount}</p>}
           </div>
 
           {/* Category */}
