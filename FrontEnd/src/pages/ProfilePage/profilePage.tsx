@@ -2,8 +2,9 @@ import React, { useEffect, useState } from "react";
 import useAuthStore from "../../store/useAuthStore";
 import useTransactionStore from "../../store/useTransactionStore";
 import { updateProfile } from "../../authentication/authMethods";
-import DeleteAccountModal from "./deleteAccountModal";
+import DeleteAccountModal from "./confirmAccountModal";
 import { deleteAccount } from "../../authentication/authMethods";
+import { useNavigate } from "react-router-dom";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -123,6 +124,7 @@ const ProfilePage: React.FC = () => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [editingInfo, setEditingInfo] = useState(false);
   const [ modalOpen, setModalOpen ] = useState<boolean>(false);
+  const navigate = useNavigate();
 
   const initials = getInitials(user?.name);
 //   const { user } = useAuthStore();
@@ -449,7 +451,14 @@ const ProfilePage: React.FC = () => {
         <DeleteAccountModal
           isOpen={modalOpen}
           onClose={() => setModalOpen(false)}
-          onConfirm={() => setShowDeleteConfirm(false)}
+          onConfirm={ async (password) => {
+            try {
+              const result = await deleteAccount(password, navigate);
+              if (result) setModalOpen(false);
+            } catch (err) {
+              console.log(err);
+            }
+          }}
         />
 
       </div>
