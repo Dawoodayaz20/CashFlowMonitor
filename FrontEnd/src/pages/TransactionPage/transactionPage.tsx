@@ -3,7 +3,7 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid,
   Tooltip, ResponsiveContainer, Cell,
 } from "recharts";
-import AddTransactionModal from "../transactionModal/addTransaction";
+import AddTransactionModal from "../../components/transactionModal/addTransaction";
 import useTransactionStore from "../../store/useTransactionStore";
 import type { Transaction, TransactionForm, TxType } from "../../../types";
 
