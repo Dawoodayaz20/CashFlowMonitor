@@ -6,6 +6,7 @@ import {
 import AddTransactionModal from "../../components/transactionModal/addTransaction";
 import useTransactionStore from "../../store/useTransactionStore";
 import type { Transaction, TransactionForm, TxType } from "../../../types";
+import useFormatters from "../../useFormatters";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -106,6 +107,7 @@ const TransactionPage: React.FC<TransactionPageProps> = ({ type }) => {
   const th = THEME[type];
 
   const { transactions, loading, error, fetchTransactions, addTransaction, updateTransaction, deleteTransaction } = useTransactionStore();
+  const { formatDate, formatCurrency } = useFormatters();
 
   // ── Fetch on mount / type change ──
   useEffect(() => {
@@ -252,11 +254,11 @@ const TransactionPage: React.FC<TransactionPageProps> = ({ type }) => {
         <div className="grid grid-cols-3 gap-4 mt-6">
           <div className="bg-white/15 border border-white/20 rounded-2xl p-4 backdrop-blur-sm">
             <p className="text-xs font-semibold uppercase tracking-widest text-white/60 mb-1">Total {th.label}</p>
-            <p className="text-2xl font-bold text-white">{fmt(total)}</p>
+            <p className="text-2xl font-bold text-white">{formatCurrency(total)}</p>
           </div>
           <div className="bg-white/15 border border-white/20 rounded-2xl p-4 backdrop-blur-sm">
             <p className="text-xs font-semibold uppercase tracking-widest text-white/60 mb-1">Avg per Entry</p>
-            <p className="text-2xl font-bold text-white">{fmt(avg)}</p>
+            <p className="text-2xl font-bold text-white">{formatCurrency(avg)}</p>
           </div>
           <div className="bg-white/15 border border-white/20 rounded-2xl p-4 backdrop-blur-sm">
             <p className="text-xs font-semibold uppercase tracking-widest text-white/60 mb-1">Top Category</p>
@@ -385,7 +387,7 @@ const TransactionPage: React.FC<TransactionPageProps> = ({ type }) => {
                     className={`border-b border-gray-50 hover:bg-gray-50/80 transition ${i % 2 === 0 ? "bg-white" : "bg-gray-50/30"}`}
                   >
                     <td className="px-6 py-4 text-gray-500 whitespace-nowrap">
-                      {new Date(tx.date).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                      {formatDate(tx.date)}
                     </td>
                     <td className="px-6 py-4">
                       <span className={`px-2.5 py-1 rounded-full text-xs font-semibold ${th.bgLight} ${th.text}`}>{tx.category}</span>
