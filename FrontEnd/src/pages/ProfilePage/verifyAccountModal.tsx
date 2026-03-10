@@ -2,12 +2,14 @@ import { useState, useEffect, useRef } from "react";
 
 interface DeleteAccountModalProps {
   isOpen: boolean;
+  title: string,
   onClose: () => void;
   onConfirm: (password: string) => void;
 }
 
-export default function DeleteAccountModal({
+export default function VerifyAccountModal({
   isOpen,
+  title,
   onClose,
   onConfirm,
 }: DeleteAccountModalProps) {
@@ -104,7 +106,7 @@ export default function DeleteAccountModal({
               </div>
               <div>
                 <p className="text-sm font-bold text-rose-900 leading-snug">
-                  Delete Account
+                  {title}
                 </p>
                 <p className="text-xs text-rose-400 mt-1 leading-relaxed">
                   This action is{" "}
