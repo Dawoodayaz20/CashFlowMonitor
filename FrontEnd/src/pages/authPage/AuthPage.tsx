@@ -28,6 +28,14 @@ const Auth: React.FC = () => {
     if (result?.message) setError(result);
   };
 
+  const handleSignInKey = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") handleSignIn();
+  };
+
+  const handleSigUpnKey = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") handleSignIn();
+  };
+
   const navigate = useNavigate();
 
   return (
@@ -65,6 +73,7 @@ const Auth: React.FC = () => {
               type={`${hidePass ? 'password' : 'text'}`}
               placeholder="••••••••"
               onChange={e => { setPass(e.target.value); setError(null); }}
+              onKeyDown={handleSignInKey}
               className="w-full mt-1 px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             <button type="button" className="text-sm px-2 py-2 mt-1 text-gray-600 border rounded focus:outline-none" onClick={(() => sethidePass(!hidePass))}>
@@ -170,6 +179,7 @@ const Auth: React.FC = () => {
               type={`${hidePass ? 'password' : 'text'}`}
               placeholder="••••••••"
               onChange={e => { setPass(e.target.value); setError(null); }}
+              onKeyDown={handleSigUpnKey}
               className="w-full mt-1 px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             <button type="button" className="text-sm px-2 py-2 mt-1 text-gray-600 border rounded focus:outline-none" onClick={(() => sethidePass(!hidePass))}>
