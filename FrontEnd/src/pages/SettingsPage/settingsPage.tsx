@@ -408,7 +408,10 @@ const SettingsPage: React.FC = () => {
                     Cancel
                   </button>
                   <button
-                    onClick={() => setModalOpen(true)}
+                    onClick={() => {
+                      setModalOpen(true);
+                      setShowClearConfirm(false)
+                    }}
                     className="px-3 py-2 rounded-xl text-sm font-semibold bg-rose-600 text-white hover:bg-rose-700 transition active:scale-95"
                   >
                     Yes, delete
