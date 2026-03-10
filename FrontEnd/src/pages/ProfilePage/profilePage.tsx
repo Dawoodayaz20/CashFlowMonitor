@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import useAuthStore from "../../store/useAuthStore";
 import useTransactionStore from "../../store/useTransactionStore";
 import { updateProfile } from "../../authentication/authMethods";
-import DeleteAccountModal from "./confirmAccountModal";
+import VerifyAccountModal from "./verifyAccountModal";
 import { deleteAccount } from "../../authentication/authMethods";
 import { useNavigate } from "react-router-dom";
 
@@ -448,8 +448,9 @@ const ProfilePage: React.FC = () => {
           </div>
         </Section>
 
-        <DeleteAccountModal
+        <VerifyAccountModal
           isOpen={modalOpen}
+          title="Delete Account"
           onClose={() => setModalOpen(false)}
           onConfirm={ async (password) => {
             try {
