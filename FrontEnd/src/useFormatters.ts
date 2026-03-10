@@ -15,15 +15,15 @@ const CURRENCY_SYMBOLS: Record<Currency, string> = {
 
 const formatDateString = (dateStr: string, format: DateFormat): string => {
   const date = new Date(dateStr);
-  const dd   = String(date.getDate()).padStart(2, "0");
-  const mm   = String(date.getMonth() + 1).padStart(2, "0");
-  const yyyy = String(date.getFullYear());
+  const dd   = date.toLocaleDateString("en-US", { day: "numeric"})
+  const mm   = date.toLocaleDateString("en-US", { month: "long"})
+  const yyyy = date.toLocaleDateString("en-US", { year: "numeric"})
 
   switch (format) {
-    case "MM/DD/YYYY": return `${mm}/${dd}/${yyyy}`;
-    case "DD/MM/YYYY": return `${dd}/${mm}/${yyyy}`;
+    case "MM/DD/YYYY": return `${mm} ${dd}, ${yyyy}`;
+    case "DD/MM/YYYY": return `${dd} ${mm}, ${yyyy}`;
     case "YYYY-MM-DD": return `${yyyy}-${mm}-${dd}`;
-    default:           return `${mm}/${dd}/${yyyy}`;
+    default:           return `${mm},${dd}, ${yyyy}`;
   }
 };
 
