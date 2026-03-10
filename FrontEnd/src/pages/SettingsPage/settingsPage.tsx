@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import useSettingsStore from "../../store/useSettingsStore";
 import type { Currency, DateFormat, BudgetLimits } from "../../store/useSettingsStore";
+import { clearAllTransactions } from "../../store/useTransactionStore";
+import VerifyAccountModal from '../ProfilePage/verifyAccountModal'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -180,6 +182,7 @@ const SettingsPage: React.FC = () => {
 
   const [showClearConfirm, setShowClearConfirm] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [ modalOpen, setModalOpen ] = useState<boolean>(false);
 
   // ── Handlers ──
   const handleSave = () => {
@@ -209,26 +212,6 @@ const SettingsPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-
-      {/* ── Header ──────────────────────────────────────────────────────────── */}
-      {/* <div
-        className="px-8 py-6"
-        style={{ background: "linear-gradient(135deg, #1e293b, #334155)" }}
-      >
-        <div className="flex items-center justify-between">
-         
-          <button
-            onClick={handleSave}
-            className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm transition-all active:scale-95 ${
-              saved
-                ? "bg-emerald-500 text-white"
-                : "bg-white text-slate-700 hover:bg-gray-100 shadow"
-            }`}
-          >
-            {saved ? "✓ Saved!" : "Save Changes"}
-          </button>
-        </div>
-      </div> */}
 
       {/* ── Page Body ────────────────────────────────────────────────────────── */}
       <div className="px-8 py-6 space-y-6 max-w-4xl">
@@ -425,7 +408,7 @@ const SettingsPage: React.FC = () => {
                     Cancel
                   </button>
                   <button
-                    onClick={handleClearData}
+                    onClick={() => setModalOpen(true)}
                     className="px-3 py-2 rounded-xl text-sm font-semibold bg-rose-600 text-white hover:bg-rose-700 transition active:scale-95"
                   >
                     Yes, delete
@@ -436,6 +419,20 @@ const SettingsPage: React.FC = () => {
 
           </div>
         </Section>
+
+              <VerifyAccountModal
+                        isOpen={modalOpen}
+                        title="Delete Transactions"
+                        onClose={() => setModalOpen(false)}
+                        onConfirm={ async (password) => {
+                          try {
+                            const result = await clearAllTransactions(password);
+                            if (result) setModalOpen(false);
+                          } catch (err) {
+                            console.log(err);
+                          }
+                        }}
+                      />
 
       </div>{/* end page body */}
     </div>
