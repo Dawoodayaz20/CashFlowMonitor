@@ -114,4 +114,32 @@ const useTransactionStore = create<TransactionState>((set, get) => ({
   },
 }));
 
+export const clearAllTransactions = async (password: string) => {
+  try {
+    const response = await fetch('http://localhost:5000/api/transactions/clear-all', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ password })
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      return { 
+        success: true, 
+        message: data.message,
+        deletedCount: data.deletedCount 
+      };
+    } else {
+      return { success: false, message: data.message };
+    }
+
+  } catch (error) {
+    console.error('Clear transactions error:', error);
+    return { success: false, message: 'Network error' };
+  }
+};
+
+
 export default useTransactionStore;
