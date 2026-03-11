@@ -38,14 +38,6 @@ const Auth: React.FC = () => {
     if (e.key === "Enter") handleSignIn();
   };
 
-  // const handleGoogleSignIn = useGoogleLogin({
-  //   onSuccess: async(res) => {
-  //     const result = await GoogleSignIn(res.access_token);
-  //     if (result?.message) setError(result);
-  //   },
-  //   onError: () => setError({ message: 'Google Sign-In failed' }),
-  // })
-
   const navigate = useNavigate();
 
   return (
@@ -53,9 +45,10 @@ const Auth: React.FC = () => {
       <div className="w-full max-w-md bg-white rounded-xl shadow-lg p-8">
         {/* Header */}
         <div className="text-center mb-6">
-          <h1 className="text-2xl font-bold">CashFlow Monitor</h1>
+          <h1 className="text-2xl font-bold">CashFlow💰 Monitor</h1>
           <p className="text-sm text-gray-500">
-            Sign in to manage your cash flow
+            { signin ?
+            "Sign in to manage your cash flow" : "Sign Up to manage your cash flow"}
           </p>
         </div>
 
@@ -126,10 +119,6 @@ const Auth: React.FC = () => {
           </div>
 
           <div className="flex items-center justify-between text-sm">
-            <label className="flex items-center gap-2">
-              <input type="checkbox" />
-              Remember me!
-            </label>
             <button type="button" className="text-blue-600 hover:underline">
               Forgot password?
             </button>
@@ -239,16 +228,6 @@ const Auth: React.FC = () => {
             </div>
           </div>
 
-          <div className="flex items-center justify-between text-sm">
-            <label className="flex items-center gap-2">
-              <input type="checkbox" />
-              Remember me!
-            </label>
-            <button type="button" className="text-blue-600 hover:underline">
-              Forgot password?
-            </button>
-          </div>
-
           <AuthError error={error} />
 
           <button
@@ -258,6 +237,13 @@ const Auth: React.FC = () => {
           >
             Sign Up
           </button>
+          <GoogleLogin
+            onSuccess={async (credentialResponse) => {
+              const result = await GoogleSignIn(credentialResponse.credential!);
+              if (result?.message && !result?.user) setError(result);
+            }}
+            onError={() => setError({ message: 'Google Sign-In failed' })}
+          />
         </form>
 
         <div className="my-6 flex items-center">
