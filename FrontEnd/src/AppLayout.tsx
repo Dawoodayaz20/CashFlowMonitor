@@ -201,6 +201,7 @@ const AppLayout: React.FC = () => {
 
       {/* ── Global Add Transaction Modal ─────────────────────────────────────── */}
       <AddTransactionModal
+        transactType='income'
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}
         onSubmit={handleTransactionSubmit}
