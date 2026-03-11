@@ -14,17 +14,23 @@ const userSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    required: true
-  }},
+    required: false
+  },
+  googleId:{
+    type: String,
+    default: null
+  }
+},
   {
   timestamps: true  // Adds createdAt and updatedAt automatically
 });
 
 userSchema.pre('save', async function(){
     if (!this.isModified('password')) return;
+    if (!this.password) return;
 
     this.password = await bcrypt.hash(this.password, 10);
-    ;     // Note: The next function tells mongoose to move to the next step
+// Note: The next function tells mongoose to move to the next step
 });
 
 userSchema.methods.comparePassword = async function(candidatePassword) {
