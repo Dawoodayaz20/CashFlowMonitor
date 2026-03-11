@@ -1,6 +1,8 @@
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken')
+const jwt = require('jsonwebtoken');
+const { OAuth2Client } = require('google-auth-library')
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 // Register new user
 const register = async (req, res) => {
@@ -180,4 +182,54 @@ const deleteAccount = async (req, res) => {
   };
 }
 
-module.exports = { register, login, logout, updateProfile, deleteAccount };
+const googleLogin = async (req, res) => {
+  try{
+    const { token } = req.body;
+
+    const ticket = await client.verifyIdToken({
+      idToken: token,
+      audience: process.env.GOOGLE_CLIENT_ID
+    })
+
+    const { name, email, sub, googleId } = ticket.getPayload();
+
+    let user = await User.findOne({ email });
+
+    if (user && !user.googleId) {
+      user.googleId = googleId;
+      await user.save();
+    }
+
+    if (!user) {
+      user = new User({ 
+        name, 
+        email, 
+        googleId // won't be used but field is required
+      });
+      await user.save();
+    }
+
+    const jwtToken = jwt.sign(
+      { userId: user._id },
+      process.env.JWT_SECRET,
+      { expiresIn: process.env.JWT_EXPIRE }
+    );
+
+    res.cookie('token', jwtToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 30 * 24 * 60 * 60 * 1000
+    });
+    
+    res.json({
+      message: 'Google login successful',
+      user: { id: user._id, name: user.name, email: user.email, createdAt: user.createdAt }
+    });
+  }
+  catch(error){
+    res.status(401).json({ message: 'Google authentication failed', error: error.message });
+  }
+}
+
+module.exports = { register, login, logout, updateProfile, deleteAccount, googleLogin };
