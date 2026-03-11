@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import {SignUp, SignIn} from '../../authentication/authMethods';
 import AuthError from "../../authentication/AuthError";
 import { useNavigate } from "react-router-dom";
+import { GoogleSignIn } from "../../authentication/googleAuth";
+import { GoogleLogin } from "@react-oauth/google";
 
 const Auth: React.FC = () => {
   const [name, setName] = useState<string>("");
@@ -35,6 +37,14 @@ const Auth: React.FC = () => {
   const handleSigUpnKey = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") handleSignIn();
   };
+
+  // const handleGoogleSignIn = useGoogleLogin({
+  //   onSuccess: async(res) => {
+  //     const result = await GoogleSignIn(res.access_token);
+  //     if (result?.message) setError(result);
+  //   },
+  //   onError: () => setError({ message: 'Google Sign-In failed' }),
+  // })
 
   const navigate = useNavigate();
 
@@ -134,6 +144,14 @@ const Auth: React.FC = () => {
           >
             Sign in
           </button>
+
+          <GoogleLogin
+            onSuccess={async (credentialResponse) => {
+              const result = await GoogleSignIn(credentialResponse.credential!);
+              if (result?.message && !result?.user) setError(result);
+            }}
+            onError={() => setError({ message: 'Google Sign-In failed' })}
+          />
         </form>
 
         <div className="my-6 flex items-center">
