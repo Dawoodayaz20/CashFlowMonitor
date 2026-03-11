@@ -1,11 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const { register, login, logout, updateProfile, deleteAccount } = require('../controllers/authController');
+const { register, login, logout, updateProfile, deleteAccount, googleLogin } = require('../controllers/authController');
 const authMiddleware = require('../middleware/authMiddleware');
 
 // POST /api/auth/register
 router.post('/register', register);
-
 
 router.post('/login', login);
 
@@ -17,5 +16,7 @@ router.put('/profile', authMiddleware, updateProfile);
 router.delete('/account', authMiddleware, deleteAccount);
 
 router.post('/logout', logout);
+
+router.post('/google', googleLogin);
 
 module.exports = router;
