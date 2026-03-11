@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import useFormatters from "../../useFormatters";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -22,6 +22,7 @@ interface AddTransactionModalProps {
   onClose: () => void;
   onSubmit: (data: TransactionForm) => void;
   initialData?: Partial<TransactionForm>;
+  transactType: TransactionType
 }
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -41,10 +42,15 @@ const today = new Date().toISOString().split("T")[0];
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
-const AddTransactionModal: React.FC<AddTransactionModalProps> = ({ isOpen, onClose, onSubmit, initialData }) => {
-const { currencySymbol } = useFormatters();  
+const AddTransactionModal: React.FC<AddTransactionModalProps> = ({ isOpen, onClose, onSubmit, initialData, transactType }) => {
+const { currencySymbol } = useFormatters();
+
+useEffect(() => {
+  setForm((prev) => ({ ...prev, type: transactType, category: "" }));
+}, [transactType]);
+
   const [form, setForm] = useState<TransactionForm>({
-    type: "income",
+    type: transactType,
     amount: "",
     category: "",
     date: today,
@@ -163,7 +169,7 @@ const { currencySymbol } = useFormatters();
                 }`}
               />
             </div>
-            {errors.amount && <p className="mt-1 text-xs text-rose-500">${errors.amount}</p>}
+            {errors.amount && <p className="mt-1 text-xs text-rose-500">{errors.amount}</p>}
           </div>
 
           {/* Category */}
