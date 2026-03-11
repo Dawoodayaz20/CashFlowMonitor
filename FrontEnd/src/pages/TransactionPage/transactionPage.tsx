@@ -227,7 +227,7 @@ const TransactionPage: React.FC<TransactionPageProps> = ({ type }) => {
         endDate: editingTx.recurring.endDate?.split("T")[0] ?? "",
       }
     : undefined;
-
+    
   return (
     <div className="min-h-screen bg-gray-50">
 
@@ -436,6 +436,7 @@ const TransactionPage: React.FC<TransactionPageProps> = ({ type }) => {
         onClose={() => { setModalOpen(false); setEditingTx(null); }}
         onSubmit={handleModalSubmit}
         initialData={editInitialData}
+        transactType={type}
       />
     </div>
   );
