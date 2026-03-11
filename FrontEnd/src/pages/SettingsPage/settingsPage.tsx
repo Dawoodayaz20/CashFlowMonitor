@@ -3,6 +3,7 @@ import useSettingsStore from "../../store/useSettingsStore";
 import type { Currency, DateFormat, BudgetLimits } from "../../store/useSettingsStore";
 import { clearAllTransactions } from "../../store/useTransactionStore";
 import VerifyAccountModal from '../ProfilePage/verifyAccountModal'
+import useFormatters from "../../useFormatters";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -140,6 +141,7 @@ const SelectField: React.FC<{
 const SettingsPage: React.FC = () => {
 
   const { settings, saveSettings, fetchSettings } = useSettingsStore();
+  const { currencySymbol } = useFormatters();
 
   useEffect(() => {
     fetchSettings();
@@ -254,7 +256,7 @@ const SettingsPage: React.FC = () => {
           <div className="flex items-center justify-between mb-5 px-4 py-3 bg-teal-50 border border-teal-100 rounded-xl">
             <p className="text-sm font-semibold text-teal-700">Total Monthly Budget</p>
             <p className="text-lg font-bold text-teal-700">
-              ${totalBudget.toLocaleString()}
+              {currencySymbol}{totalBudget.toLocaleString()}
             </p>
           </div>
 
@@ -271,7 +273,7 @@ const SettingsPage: React.FC = () => {
                   </label>
                   <div className="relative">
                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-semibold">
-                      $
+                      {currencySymbol}
                     </span>
                     <input
                       type="number"
@@ -324,7 +326,7 @@ const SettingsPage: React.FC = () => {
                   Alert Threshold
                 </label>
                 <div className="relative max-w-xs">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-semibold">$</span>
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-semibold">{currencySymbol}</span>
                   <input
                     type="number"
                     min="0"
