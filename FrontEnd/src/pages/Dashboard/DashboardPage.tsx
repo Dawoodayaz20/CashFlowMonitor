@@ -357,6 +357,7 @@ const Dashboard: React.FC = () => {
       {/* ── Transaction Modal ─────────────────────────────────────────────────── */}
       <AddTransactionModal
         isOpen={modalOpen}
+        transactType='income'
         onClose={() => setModalOpen(false)}
         onSubmit={handleTransactionSubmit}
       />
