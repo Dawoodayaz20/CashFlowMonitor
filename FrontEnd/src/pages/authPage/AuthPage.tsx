@@ -34,7 +34,7 @@ const Auth: React.FC = () => {
     if (e.key === "Enter") handleSignIn();
   };
 
-  const handleSigUpnKey = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleSignUpKey = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") handleSignIn();
   };
 
@@ -186,7 +186,7 @@ const Auth: React.FC = () => {
               type={`${hidePass ? 'password' : 'text'}`}
               placeholder="••••••••"
               onChange={e => { setPass(e.target.value); setError(null); }}
-              onKeyDown={handleSigUpnKey}
+              onKeyDown={handleSignUpKey}
               className="w-full mt-1 px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             <button type="button" className="text-sm px-2 py-2 mt-1 text-gray-600 border rounded focus:outline-none" onClick={(() => sethidePass(!hidePass))}>
