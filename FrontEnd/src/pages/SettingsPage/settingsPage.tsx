@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import useSettingsStore from "../../store/useSettingsStore";
 import type { Currency, DateFormat, BudgetLimits } from "../../store/useSettingsStore";
-import { clearAllTransactions } from "../../store/useTransactionStore";
+import useTransactionStore, { clearAllTransactions } from "../../store/useTransactionStore";
 import VerifyAccountModal from '../ProfilePage/verifyAccountModal'
 import useFormatters from "../../useFormatters";
 
@@ -141,10 +141,12 @@ const SelectField: React.FC<{
 const SettingsPage: React.FC = () => {
 
   const { settings, saveSettings, fetchSettings } = useSettingsStore();
+  const { transactions, fetchTransactions} = useTransactionStore();
   const { currencySymbol } = useFormatters();
 
   useEffect(() => {
     fetchSettings();
+    fetchTransactions();
   }, []);
 
   useEffect(() => {
@@ -200,15 +202,33 @@ const SettingsPage: React.FC = () => {
   };
 
   const handleExportCSV = () => {
-    console.log("Export CSV triggered");
-    // → wire to backend later
+    const headers = ["Date", "Type", "Category", "Amount", "Note", "Recurring"];
+    
+    const rows = transactions.map(tx => [
+      tx.date,
+      tx.type,
+      tx.category,
+      tx.amount,
+      tx.note ?? "",
+      tx.recurring.isRecurring ? tx.recurring.frequency : "No",
+    ]);
+
+    const csv = [headers, ...rows].map(r => r.join(",")).join("\n");
+    
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement("a");
+    a.href     = url;
+    a.download = "transactions.csv";
+    a.click();
+    URL.revokeObjectURL(url);
   };
 
-  const handleClearData = () => {
-    console.log("Clear all data triggered");
-    setShowClearConfirm(false);
-    // → wire to backend later
-  };
+  
+
+  const incomes = transactions.filter((tx) => tx.amount > 100, 0)
+  const months = transactions.map((tx) => new Date(tx.date).getMonth() + 1)
+  // console.log(months)
 
   const totalBudget = Object.values(budgets).reduce((s, v) => s + v, 0);
 
