@@ -143,6 +143,29 @@ const TransactionPage: React.FC<TransactionPageProps> = ({ type }) => {
     });
   }, [transactions, year, month, dateFrom, dateTo]);
 
+  const handleExportCSV = () => {
+    const headers = ["Date", "Type", "Category", "Amount", "Note", "Recurring"];
+    
+    const rows = monthFiltered.map(tx => [
+      tx.date,
+      tx.type,
+      tx.category,
+      tx.amount,
+      tx.note ?? "",
+      tx.recurring.isRecurring ? tx.recurring.frequency : "No",
+    ]);
+
+    const csv = [headers, ...rows].map(r => r.join(",")).join("\n");
+    
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement("a");
+    a.href     = url;
+    a.download = `${new Date(year, month - 1).toLocaleDateString('default', {'month': 'long'})} ${type} transactions.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   // ── Search + sort ──
   const displayed = useMemo(() => {
     let rows = monthFiltered.filter((tx) => {
@@ -228,6 +251,11 @@ const TransactionPage: React.FC<TransactionPageProps> = ({ type }) => {
       }
     : undefined;
     
+  console.log(new Date(year, month - 1).toLocaleDateString('default', {'month': 'short'}));
+  // console.log(month)
+  // console.log(year)
+  // console.log(dateTo - dateFrom)
+
   return (
     <div className="min-h-screen bg-gray-50">
 
@@ -283,7 +311,15 @@ const TransactionPage: React.FC<TransactionPageProps> = ({ type }) => {
             <button onClick={prevMonth} className="w-7 h-7 rounded-lg hover:bg-gray-100 flex items-center justify-center text-gray-500 transition">←</button>
             <span className="text-sm font-semibold text-gray-700 min-w-[130px] text-center">{monthLabel(year, month)}</span>
             <button onClick={nextMonth} className="w-7 h-7 rounded-lg hover:bg-gray-100 flex items-center justify-center text-gray-500 transition">→</button>
+            <button
+                onClick={handleExportCSV}
+                className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold border border-gray-200 bg-white text-gray-600 hover:bg-gray-100 transition active:scale-95"
+              >
+                ⬇️ Export CSV
+              </button>
           </div>
+
+          
 
           <div className="flex items-center gap-2">
             <span className="text-xs font-semibold uppercase tracking-wider text-gray-400">Custom range:</span>
