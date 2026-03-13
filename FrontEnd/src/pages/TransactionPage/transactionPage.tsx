@@ -161,9 +161,20 @@ const TransactionPage: React.FC<TransactionPageProps> = ({ type }) => {
     const url  = URL.createObjectURL(blob);
     const a    = document.createElement("a");
     a.href     = url;
-    a.download = `${new Date(year, month - 1).toLocaleDateString('default', {'month': 'long'})} ${type} transactions.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
+    if(dateFrom && dateTo){
+      const year1 = (new Date(dateFrom).getFullYear())
+      const month1 = new Date(dateFrom).toLocaleDateString('default', {'month': 'long'});
+      const date1 = new Date(dateFrom).toLocaleDateString('default', {'day': "numeric"});
+      const date2 = new Date(dateTo).toLocaleDateString('default', {'day': "numeric"});
+      const month2 = new Date(dateTo).toLocaleDateString('default', {'month': 'long'});
+      a.download = `${date1} ${month1} to ${date2} ${month2} - ${year1} transactions.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } else {
+      a.download = `${new Date(year, month - 1).toLocaleDateString('default', {'month': 'long'})} ${type} transactions.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }    
   };
 
   // ── Search + sort ──
@@ -251,10 +262,18 @@ const TransactionPage: React.FC<TransactionPageProps> = ({ type }) => {
       }
     : undefined;
     
-  console.log(new Date(year, month - 1).toLocaleDateString('default', {'month': 'short'}));
+  // console.log(new Date(year, month - 1).toLocaleDateString('default', {'month': 'short'}));
   // console.log(month)
-  // console.log(year)
-  // console.log(dateTo - dateFrom)
+  // console.log(new Date(dateTo).toLocaleDateString('default', {'month': 'long'}))
+  // console.log(new Date(dateFrom).getFullYear())
+
+  // const year1 = (new Date(dateFrom).getFullYear())
+  // const month1 = new Date(dateFrom).toLocaleDateString('default', {'month': 'long'});
+  // const date1 = new Date(dateFrom).toLocaleDateString('default', {'day': "numeric"});
+  // const date2 = new Date(dateTo).toLocaleDateString('default', {'day': "numeric"});
+  // const month2 = new Date(dateTo).toLocaleDateString('default', {'month': 'long'});
+
+  // console.log(`${year1} ${date1} ${month1} - ${date2} ${month2}`)
 
   return (
     <div className="min-h-screen bg-gray-50">
