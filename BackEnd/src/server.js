@@ -27,3 +27,6 @@ app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
 const transactionRoutes = require('./routes/transactionRoutes');
 app.use('/api/transactions', transactionRoutes);
+
+const Settingsroutes = require('./routes/settingsRoutes')
+app.use('/api/settings', Settingsroutes);
