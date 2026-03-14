@@ -59,24 +59,7 @@ const DEFAULT_SETTINGS: AppSettings = {
   },
 };
 
-const STORAGE_KEY = "cashflow_settings";
-
-// ─── localStorage helpers (swap these two for API calls later) ────────────────
-
-const loadFromStorage = (): AppSettings => {
-  // ↓ SWAP: replace with → const res = await fetch("/api/settings")
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? { ...DEFAULT_SETTINGS, ...JSON.parse(raw) } : DEFAULT_SETTINGS;
-  } catch {
-    return DEFAULT_SETTINGS;
-  }
-};
-
-const saveToStorage = (settings: AppSettings): void => {
-  // ↓ SWAP: replace with → await fetch("/api/settings", { method: "PUT", body: JSON.stringify(settings) })
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
-};
+const API_URL = `${import.meta.env.API_URL}/settings`;
 
 // ─── Store Interface ──────────────────────────────────────────────────────────
 
@@ -97,13 +80,18 @@ const useSettingsStore = create<SettingsState>((set) => ({
   error:    null,
 
   // ── Fetch ─────────────────────────────────────────────────────────────────
-  // Currently reads from localStorage.
-  // TO SWAP TO DB: replace loadFromStorage() with your API call.
   fetchSettings: async () => {
     set({ loading: true, error: null });
     try {
-      const settings = loadFromStorage();
-      set({ settings });
+      const res = await fetch(API_URL, {
+        credentials: 'include'  // send JWT cookie
+      });
+
+      if (!res.ok) throw new Error('Failed to fetch settings');
+
+      const data = await res.json();
+      set({ settings: { ...DEFAULT_SETTINGS, ...data.settings } });
+
     } catch (err: any) {
       set({ error: err.message });
     } finally {
@@ -112,13 +100,21 @@ const useSettingsStore = create<SettingsState>((set) => ({
   },
 
   // ── Save ──────────────────────────────────────────────────────────────────
-  // Currently writes to localStorage.
-  // TO SWAP TO DB: replace saveToStorage() with your API call.
   saveSettings: async (updated: AppSettings) => {
     set({ loading: true, error: null });
     try {
-      saveToStorage(updated);
-      set({ settings: updated });
+      const res = await fetch(API_URL, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',  // send JWT cookie
+        body: JSON.stringify(updated)
+      });
+
+      if (!res.ok) throw new Error('Failed to save settings');
+
+      const data = await res.json();
+      set({ settings: { ...DEFAULT_SETTINGS, ...data.settings } });
+
     } catch (err: any) {
       set({ error: err.message });
     } finally {
