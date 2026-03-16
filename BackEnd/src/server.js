@@ -4,9 +4,9 @@ const cors = require('cors');
 const connectDB = require('../config/db');
 const authRoutes = require('./routes/authRoutes')
 const cookieParser = require('cookie-parser');
-
 dotenv.config();
 connectDB();
+require('./services/cronJobs');
 
 const app = express();
 
@@ -22,11 +22,11 @@ app.get('/', (req, res) => {
   res.json({ message: 'Backend is running' });
 });
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-
 const transactionRoutes = require('./routes/transactionRoutes');
 app.use('/api/transactions', transactionRoutes);
 
-const Settingsroutes = require('./routes/settingsRoutes')
-app.use('/api/settings', Settingsroutes);
+const settingsRoutes = require('./routes/settingsRoutes')
+app.use('/api/settings', settingsRoutes);
+
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
